@@ -1,0 +1,23 @@
+<launch>
+  <rosparam command="load" file="$(find videre_pcl_proc)/launch/arm5e_pc_grasp_planning.yaml" />
+  
+  <arg name="input_basename" default="amphoraUWSim" />
+  <arg name="rad" default="0.5" />
+  <arg name="angle" default="3.94" /> 
+  <arg name="along" default="0.0" /> 
+  <arg name="alignedGrasp" default="false" />
+
+
+
+  <param name="input_basename" value="$(find videre_pcl_proc)/bin/$(arg input_basename)" />
+  <param name="rad" value="$(arg rad)" />
+  <param name="angle" value="$(arg angle)" />
+  <param name="along" value="$(arg along)" />
+  <param name="alignedGrasp" value="$(arg alignedGrasp)" />
+  <param name="resources_data_path" value="$(find videre_pcl_proc)/resources" />
+  
+  <node name="arm5e_pc_grasp_planning" pkg="videre_pcl_proc" type="arm5e_pc_grasp_planning" output="screen" respawn="false"/>
+
+</launch>
+
+

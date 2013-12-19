@@ -1,0 +1,26 @@
+<package>
+  <description brief="videre_pcl_proc">
+
+     videre_pcl_proc
+
+  </description>
+  <author>IRSLab</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/videre_pcl_proc</url>
+  <depend package="pcl"/>
+  <depend package="pcl_ros"/>
+  <depend package="roscpp"/>
+  <depend package="sensor_msgs"/>
+  <depend package="nav_msgs"/>
+  <depend package="mar_perception"/>
+  <depend package="tf"/>
+  <depend package="tf_conversions"/>
+
+  <!-- PCGuided -->
+  <depend package="mar_ros_bridge"/>
+  <depend package="UWSim"/>
+  <rosdep name="libxml++-2.6" />
+</package>
+
+
