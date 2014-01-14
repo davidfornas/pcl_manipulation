@@ -7,22 +7,23 @@
 
 
 // PCL specific includes
-#include <pcl/ros/conversions.h>
+#include <pcl_conversions/pcl_conversions.h>
+//#include <pcl/ros/conversions.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
-#include <pcl/visualization/cloud_viewer.h>
-#include <pcl/sample_consensus/model_types.h>
-#include <pcl/sample_consensus/method_types.h>
-#include <pcl/segmentation/sac_segmentation.h>
+//#include <pcl/visualization/cloud_viewer.h>
+//#include <pcl/sample_consensus/model_types.h>
+//#include <pcl/sample_consensus/method_types.h>
+//#include <pcl/segmentation/sac_segmentation.h>
 
-#include <pcl/filters/passthrough.h>
-#include <pcl/filters/radius_outlier_removal.h>
-#include <pcl/filters/conditional_removal.h>
-#include <pcl/filters/voxel_grid.h>
-#include <pcl/surface/convex_hull.h>
+//#include <pcl/filters/passthrough.h>
+//#include <pcl/filters/radius_outlier_removal.h>
+//#include <pcl/filters/conditional_removal.h>
+//#include <pcl/filters/voxel_grid.h>
+//#include <pcl/surface/convex_hull.h>
 
-#include <pcl/filters/voxel_grid.h>
+//#include <pcl/filters/voxel_grid.h>
 #include <mar_perception/VirtualImage.h>
 
 ros::Publisher pub, pub2;
@@ -55,8 +56,12 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   //
   // Convert the sensor_msgs/PointCloud2 data to pcl/PointCloud
   pcl::PointCloud<pcl::PointXYZRGB> cloud;
+  //pcl_conversions::toPCL(*input, cloud);
+  //pcl::SomePCLFunction(pcl_pc);
+  
+  //pcl::PointCloud<pcl::PointXYZRGB> cloud(*input);
   pcl::fromROSMsg (*input, cloud);
-
+  
 //boost::shared_ptr< pcl::PointCloud<pcl::PointXYZRGB> > cloud_filtered_x =  //boost::make_shared<pcl::PointCloud<pcl::PointXYZRGB> >(cloud);
 //Outlier removal
 	//pcl::RadiusOutlierRemoval<pcl::PointXYZRGB> outrem;
@@ -108,7 +113,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   //// Publish the model coefficients
   //pub2.publish (coefficients);
   // Publish the data
-  pub.publish (output);
+  //pub.publish (output);
   ROS_INFO("The cloud is saved((inversed)).");
 }
 
@@ -130,9 +135,9 @@ main (int argc, char** argv)
   ros::Subscriber sub = nh.subscribe ("camera/points2", 1, cloud_cb);
 
   // Create a ROS publisher for the output point cloud
-  pub = nh.advertise<sensor_msgs::PointCloud2> ("output", 1);
+  pub = nh.advertise<pcl::PCLPointCloud2> ("output", 1);
   // Create a ROS publisher for the output model coefficients
-  pub2 = nh.advertise<pcl::ModelCoefficients> ("outputC", 1);
+  //pub2 = nh.advertise<pcl::ModelCoefficients> ("outputC", 1);
   // Spin
   ros::spin ();
 }

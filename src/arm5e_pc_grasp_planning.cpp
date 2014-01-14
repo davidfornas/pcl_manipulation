@@ -4,18 +4,19 @@
  *  Created on: 23/01/2013
  *      Author: dfornas
  */
-#include <ConfigXMLParser.h>
+#include <uwsim/ConfigXMLParser.h>
 
 //MAR
 #include <mar_perception/PCAutonomousGraspPlanning.h>
 #include <mar_ros_bridge/mar_params.h>
 
 //UWSim + OSG
-#include <SceneBuilder.h>
-#include <ViewBuilder.h>
-#include <UWSimUtils.h>
-#include <osgPCDLoader.h>
+#include <uwsim/SceneBuilder.h>
+#include <uwsim/ViewBuilder.h>
+#include <uwsim/UWSimUtils.h>
+#include <uwsim/osgPCDLoader.h>
 #include <osgGA/TrackballManipulator>
+
 
 //PCL
 #include <pcl/io/pcd_io.h>
