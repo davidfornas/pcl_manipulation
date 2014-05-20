@@ -5,7 +5,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/><!-- rpy 0 0 0 -->
       <geometry>
-        <mesh filename="robot/ARM5E/ARM5E_part4_base.osg"/>
+        <mesh filename="package://UWSim/data/robot/ARM5E/ARM5E_part4_base.osg"/>
       </geometry>
     </visual>
   </link>
@@ -14,7 +14,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="robot/ARM5E/ARM5E_part4_jaw1long.osg"/>
+        <mesh filename="package://UWSim/data/robot/ARM5E/ARM5E_part4_jaw1long.osg"/>
       </geometry>
     </visual>
   </link>
@@ -31,7 +31,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="robot/ARM5E/ARM5E_part4_jaw2long.osg"/>
+        <mesh filename="package://UWSim/data/robot/ARM5E/ARM5E_part4_jaw2long.osg"/>
       </geometry>
     </visual>
   </link>

@@ -5,6 +5,7 @@
  *      Author: dfornas
  */
 #include <uwsim/ConfigXMLParser.h>
+#include <string>
 
 //MAR
 #include <mar_perception/PCAutonomousGraspPlanning.h>
@@ -16,7 +17,6 @@
 #include <uwsim/UWSimUtils.h>
 #include <uwsim/osgPCDLoader.h>
 #include <osgGA/TrackballManipulator>
-
 
 //PCL
 #include <pcl/io/pcd_io.h>
@@ -30,13 +30,12 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <tf/transform_broadcaster.h>
 
-
 //TF Broadcaster to visualize target pose, could be a marker also.
 tf::TransformBroadcaster *broadcaster;
 
 double i=0;
 void publish_cMg(vpHomogeneousMatrix cMe){
-   
+
   vpHomogeneousMatrix test(0,0,0,M_PI/2,0,0); //vpHomogeneousMatrix test(0,0,0,0,M_PI/2,0);
   vpHomogeneousMatrix test2(0,0,0,0,0,M_PI/2);
   cMe=cMe*test*test2;	
@@ -60,7 +59,6 @@ void publish_cMg(vpHomogeneousMatrix cMe){
 
 }
 
-
 /** Plans a grasp on a point cloud and visualizes it using UWSim
  * Expects the following params to be set in the ROS parameter server:
  * input_basename: The full path to the input files without PCD extension, ie. /tmp/scan_2
@@ -79,7 +77,7 @@ int main(int argc, char **argv) {
 
   std::string input_basename("output");
   nh.getParam("input_basename", input_basename);
-  
+
   nh.param("alignedGrasp", alignedGrasp, false);
   nh.getParam("angle", angle);
   nh.getParam("rad", rad);
@@ -93,7 +91,7 @@ int main(int argc, char **argv) {
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
   reader.read (point_cloud_file, *cloud);
   std::cerr << "PointCloud has: " << cloud->points.size () << " data points." << std::endl;
-  
+
   //Auto planner
   PCAutonomousGraspPlanning planner(angle, rad, along, alignedGrasp, cloud);
   planner.perceive();
@@ -105,6 +103,8 @@ int main(int argc, char **argv) {
   std::string resources_data_path(".");
   nh.getParam("resources_data_path", resources_data_path);
   osgDB::Registry::instance()->getDataFilePathList().push_back(resources_data_path);
+  const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
+  osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH));
 
   boost::shared_ptr<osg::ArgumentParser> arguments(new osg::ArgumentParser(&argc,argv));
   std::string configfile=resources_data_path+"/arm5e_gripper.xml";
@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
   UWSimGeometry::applyStateSets(gt);
   builder.getScene()->localizedWorld->addChild(gt);
 
-  
+
   //Hand frame wrt end-effector
   vpHomogeneousMatrix eMh=mar_params::paramToVispHomogeneousMatrix(&nh, "eMh");
   vpHomogeneousMatrix cMe=planner.get_cMg();///*eMh.inverse();
@@ -145,22 +145,22 @@ int main(int argc, char **argv) {
 
   while( ros::ok() && !view.getViewer()->done())
   {
-	cv::namedWindow("Grasp configuration", CV_WINDOW_NORMAL );
-  	cv::createTrackbar( "Radius", "Grasp configuration", &(planner.irad), 100 );
-  	cv::createTrackbar( "Angle", "Grasp configuration", &(planner.iangle), 360 );
-        cv::createTrackbar( "Distance", "Grasp configuration", &(planner.ialong), 100 );
-        cv::createTrackbar( "Aligned grasp?", "Grasp configuration", &(planner.ialigned_grasp), 1 );
+    cv::namedWindow("Grasp configuration", CV_WINDOW_NORMAL );
+    cv::createTrackbar( "Radius", "Grasp configuration", &(planner.irad), 100 );
+    cv::createTrackbar( "Angle", "Grasp configuration", &(planner.iangle), 360 );
+    cv::createTrackbar( "Distance", "Grasp configuration", &(planner.ialong), 100 );
+    cv::createTrackbar( "Aligned grasp?", "Grasp configuration", &(planner.ialigned_grasp), 1 );
 
-        planner.recalculate_cMg();
-        cMe=planner.get_cMg();///*eMh.inverse();
-        osg::Matrixd osg_cMe(cMe.transpose().data);
-        gt->setMatrix(osg_cMe);
-        publish_cMg(cMe);
-        builder.iauvFile[0]->setVehiclePosition(osg_cMe);
-        cv::waitKey(5);
-    
-        ros::spinOnce();
-        view.getViewer()->frame();
+    planner.recalculate_cMg();
+    cMe=planner.get_cMg();///*eMh.inverse();
+    osg::Matrixd osg_cMe(cMe.transpose().data);
+    gt->setMatrix(osg_cMe);
+    publish_cMg(cMe);
+    builder.iauvFile[0]->setVehiclePosition(osg_cMe);
+    cv::waitKey(5);
+
+    ros::spinOnce();
+    view.getViewer()->frame();
   }
 
   return 1;

@@ -20,6 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
   mar_ros_bridge
   mar_perception
   uwsim
+  robot_state_publisher
 )
 find_package(uwsim REQUIRED)
 find_package(uwsim_osgocean REQUIRED)
@@ -29,6 +30,7 @@ find_package(uwsim_bullet REQUIRED)
 
 find_package(VISP REQUIRED)
 find_package(PCL REQUIRED)
+find_package(orocos_kdl REQUIRED)
 
 catkin_package(
   CATKIN_DEPENDS    
@@ -41,6 +43,7 @@ catkin_package(
     mar_ros_bridge
     mar_perception
     uwsim
+    robot_state_publisher
   DEPENDS
     libxml++-2.6
     OpenSceneGraph
@@ -50,6 +53,7 @@ catkin_package(
     uwsim_bullet
     VISP
     PCL
+    orocos_kdl
 )
 
 add_definitions(${VISP_DEFINITIONS})
@@ -58,17 +62,20 @@ LINK_DIRECTORIES(${LIBXML++_LIBRARY_DIRS} ${VISP_LIBRARY_DIRS})
 
 add_executable(save_cloud src/save_cloud.cpp)
 add_executable(cylinder src/cylinder.cpp)
-add_executable(arm5e_pc_grasp_planning src/arm5e_pc_grasp_planning.cpp)
+#add_executable(arm5e_pc_grasp_planning src/arm5e_pc_grasp_planning.cpp)
 add_executable(grasp_exec src/grasp_exec.cpp)
 
-target_link_libraries (arm5e_pc_grasp_planning ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OSGOCEAN_LIBRARIES} vtkHybrid vtkRendering) 
+#target_link_libraries (arm5e_pc_grasp_planning ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OSGOCEAN_LIBRARIES} vtkHybrid vtkRendering) 
 target_link_libraries (save_cloud ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
 target_link_libraries (grasp_exec ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
 target_link_libraries (cylinder ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
+add_executable(VispToTFtest src/VispToTFtest.cpp)
+target_link_libraries(VispToTFtest ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+
 
 install(
   TARGETS
-    arm5e_pc_grasp_planning
+    #arm5e_pc_grasp_planning
     save_cloud
     grasp_exec
     cylinder
@@ -77,4 +84,7 @@ install(
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+install(DIRECTORY launch resources
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
