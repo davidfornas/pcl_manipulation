@@ -1,4 +1,5 @@
-/*
+//* arm5e point cloud grasp planning
+/** 
  * Plans a 3D grasp on the point cloud autonomously.
  *
  *  Created on: 23/01/2013
@@ -31,9 +32,18 @@
 #include <tf/transform_broadcaster.h>
 
 //TF Broadcaster to visualize target pose, could be a marker also.
-tf::TransformBroadcaster *broadcaster;
+tf::TransformBroadcaster *broadcaster; /**< Global TF transformer */
+double i=0;/**< A very important variable */
 
-double i=0;
+
+/*!
+* \brief Publish cMg on the TF tree.
+*
+* It transforms from Visp to Quaternion and Vector in order to create a tranform for TF.
+* 
+* \param cMe       vpHomogeneousMatrix to publish
+*/
+
 void publish_cMg(vpHomogeneousMatrix cMe){
 
   vpHomogeneousMatrix test(0,0,0,M_PI/2,0,0); //vpHomogeneousMatrix test(0,0,0,0,M_PI/2,0);
@@ -82,6 +92,8 @@ int main(int argc, char **argv) {
   nh.getParam("angle", angle);
   nh.getParam("rad", rad);
   nh.getParam("along", along);
+
+  /** @todo Put this code in a separate class */
 
   //Point Cloud load
   std::string point_cloud_file(input_basename+std::string(".pcd"));

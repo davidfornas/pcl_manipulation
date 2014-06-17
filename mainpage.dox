@@ -2,10 +2,10 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b videre_pcl_proc is ... 
+\b videre_pcl_proc is a package to test state of the art algorithms. 
 
 <!-- 
-Provide an overview of your package.
+This package should be used carefully as it's no fully tested yet.
 -->
 
 
