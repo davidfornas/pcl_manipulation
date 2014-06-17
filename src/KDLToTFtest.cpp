@@ -74,13 +74,19 @@ int main(int argc, char **argv) {
   //Moving the worl to see better.
   vpHomogeneousMatrix wMb(0.50,0,0,M_PI,0,0);
     
-  v.addTransform(wMb, "world", "base", "w");
-  v.addTransform(vpHomogeneousMatrix(0,0,0,0,0,0), "base", "Slew", "d");
-  v.addTransform(bMf1, "Slew", "Shoulder", "1");
-  v.addTransform(bMf2, "Shoulder", "Elbow", "2");
-  v.addTransform(bMf3, "Elbow", "Wrist", "3");
-  v.addTransform(bMf4, "Wrist", "EE", "4");
+  //.addTransform(wMb, "world", "base", "w");
+  bool eefOnly=false;
+  
+  if(!eefOnly){  
+  
+	  v.addTransform(vpHomogeneousMatrix(0,0,0,0,0,0), "base", "Slew", "d");
+	  v.addTransform(bMf1, "Slew", "Shoulder", "1");
+	  v.addTransform(bMf2, "Shoulder", "Elbow", "2");
+	  v.addTransform(bMf3, "Elbow", "Wrist", "3");
+	  v.addTransform(bMf4, "Wrist", "EE", "4");
 
+  }
+  
   //Solving FK for each joints is equivalent.
   /*vpHomogeneousMatrix bMf1 = directKinematics(q,1,fksolver);
   vpHomogeneousMatrix bMf2 = directKinematics(q,2,fksolver);
