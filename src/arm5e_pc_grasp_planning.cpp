@@ -1,6 +1,6 @@
 //* arm5e point cloud grasp planning
 /** 
- * Plans a 3D grasp on the point cloud autonomously.
+ * 3D interface to plan a grasp using a point cloud.
  *
  *  Created on: 23/01/2013
  *      Author: dfornas
@@ -10,6 +10,7 @@
 
 //MAR
 #include <mar_perception/PCAutonomousGraspPlanning.h>
+#include <mar_perception/VispUtils.h>
 #include <mar_ros_bridge/mar_params.h>
 
 //UWSim + OSG
@@ -32,9 +33,9 @@
 #include <tf/transform_broadcaster.h>
 
 //TF Broadcaster to visualize target pose, could be a marker also.
-tf::TransformBroadcaster *broadcaster; /**< Global TF transformer */
-double i=0;/**< A very important variable */
+//tf::TransformBroadcaster *broadcaster; 
 
+VispToTF * vispTf;
 
 /*!
 * \brief Publish cMg on the TF tree.
@@ -43,30 +44,15 @@ double i=0;/**< A very important variable */
 * 
 * \param cMe       vpHomogeneousMatrix to publish
 */
-
 void publish_cMg(vpHomogeneousMatrix cMe){
 
-  vpHomogeneousMatrix test(0,0,0,M_PI/2,0,0); //vpHomogeneousMatrix test(0,0,0,0,M_PI/2,0);
-  vpHomogeneousMatrix test2(0,0,0,0,0,M_PI/2);
-  cMe=cMe*test*test2;	
-
-  std::cerr << "cMg pre:" << std::endl << cMe;
-
-  //cMe to PoseStamped
-  vpQuaternionVector q;
-  vpTranslationVector V;
-  cMe.extract(q);
-  cMe.extract(V);
-
-  tf::Vector3 p(V[0], V[1], V[2]);
-  tf::Quaternion tf_q(q.x(), q.y(), q.z(), q.w());
-  tf::Transform pose;
-  pose.setOrigin(p);
-  pose.setRotation(tf_q);
-
-  tf::StampedTransform t(pose, ros::Time::now(), "/camera", "/grasp_frame");
-  broadcaster->sendTransform(t);
-
+  //Adapt the visual frame to be the right ee frame.
+  vpHomogeneousMatrix rx(0,0,0,M_PI,0,0); 
+  vpHomogeneousMatrix ry(0,0,0,0,M_PI/2,0);
+  cMe=cMe*rx*ry;	
+  vispTf->resetTransform(cMe);
+  vispTf->publish();
+ 
 }
 
 /** Plans a grasp on a point cloud and visualizes it using UWSim
@@ -78,8 +64,6 @@ void publish_cMg(vpHomogeneousMatrix cMe){
 int main(int argc, char **argv) {
   ros::init(argc, argv, "arm5e_pc_grasp_planning");
   ros::NodeHandle nh;
-
-  broadcaster = new tf::TransformBroadcaster();
 
   //Angulo de agarre
   double angle, rad, along;
@@ -153,6 +137,7 @@ int main(int argc, char **argv) {
   vpHomogeneousMatrix eMh=mar_params::paramToVispHomogeneousMatrix(&nh, "eMh");
   vpHomogeneousMatrix cMe=planner.get_cMg();///*eMh.inverse();
 
+  vispTf = new VispToTF(cMe, "stereo", "grasp");
   publish_cMg(cMe);
 
   while( ros::ok() && !view.getViewer()->done())

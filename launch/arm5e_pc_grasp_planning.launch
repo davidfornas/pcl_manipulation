@@ -1,7 +1,7 @@
 <launch>
   <rosparam command="load" file="$(find pcl_manipulation)/launch/arm5e_pc_grasp_planning.yaml" />
   
-  <arg name="input_basename" default="amphoraUWSim" />
+  <arg name="input_basename" default="cuba_junio_1" />
   <arg name="rad" default="0.5" />
   <arg name="angle" default="3.94" /> 
   <arg name="along" default="0.0" /> 
@@ -14,7 +14,7 @@
   <param name="alignedGrasp" value="$(arg alignedGrasp)" />
   <param name="resources_data_path" value="$(find pcl_manipulation)/resources" />
   
-  <node name="grasp_exec" pkg="pcl_manipulation" type="grasp_exec" output="screen" respawn="false"/>
+  <!--<node name="grasp_exec" pkg="pcl_manipulation" type="grasp_exec" output="screen" respawn="false"/>-->
   <node name="arm5e_pc_grasp_planning" pkg="pcl_manipulation" type="arm5e_pc_grasp_planning" output="screen" respawn="false"/>
 </launch>
 
