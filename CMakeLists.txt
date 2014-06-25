@@ -68,6 +68,8 @@ add_executable(test_pcl src/test_pcl.cpp)
 add_executable(cylinder src/cylinder.cpp)
 add_executable(arm5e_pc_grasp_planning src/arm5e_pc_grasp_planning.cpp)
 add_executable(grasp_exec src/grasp_exec.cpp)
+
+
 target_link_libraries (arm5e_pc_grasp_planning ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OSGOCEAN_LIBRARIES} vtkHybrid vtkRendering) 
 target_link_libraries (save_cloud ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
 target_link_libraries (test_pcl ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
@@ -77,12 +79,16 @@ target_link_libraries (cylinder ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} 
 #TESTS for MAR and more
 add_executable(VispToTFtest src/VispToTFtest.cpp)
 add_executable(KDLToTFtest src/KDLToTFtest.cpp)
+add_executable(forward_kinematics src/forward_kinematics.cpp)
+
 target_link_libraries(VispToTFtest ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 target_link_libraries(KDLToTFtest ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+target_link_libraries(forward_kinematics ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+
 
 install(
   TARGETS
-    #arm5e_pc_grasp_planning
+    arm5e_pc_grasp_planning
     save_cloud
     grasp_exec
     cylinder
