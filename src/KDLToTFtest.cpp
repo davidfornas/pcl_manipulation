@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
   VispToTF v;
 
   double qx[5];
-  
+   
   qx[0]=atof(argv[1]);
   qx[1]=atof(argv[2]);
   qx[2]=atof(argv[3]);
