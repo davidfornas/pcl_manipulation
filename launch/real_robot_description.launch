@@ -1,15 +1,16 @@
 <launch>
-	<arg name="model" default="$(find uwsim)/data/scenes/g500ARM5-rviz2.urdf"/>
+	<!--arg name="model" default="$(find uwsim)/data/scenes/g500ARM5-rviz2.urdf"/-->
+    <arg name="model" default="ARM5.urdf"/>
 	<arg name="gui" default="False" />
 	
 	<param name="robot_description" textfile="$(arg model)" />
 	<param name="use_gui" value="$(arg gui)" />
-	<param name="tf_prefix" value="/arm5e" />
+	<!--param name="tf_prefix" value="/arm5e" /-->
 	
 	
 	<!--node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" /-->
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">	
-		<remap from="/joint_states" to="/arm5e/joint_state_angle" />
+		<remap from="/joint_states" to="/arm5e/joint_state_angle" /> <!-- fixed si se usa joint offset -->
 	</node>
 
 </launch>
