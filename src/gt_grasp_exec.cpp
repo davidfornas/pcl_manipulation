@@ -1,3 +1,10 @@
+/** 
+ * Grasp command utility. Uses topics to interface with an arm defined
+ * with URDF, typically the GT arm. Receives commands by string messages.
+ *
+ *  Created on: 01/09/2013
+ *      Author: dfornas
+ */
 #include <geometry_msgs/PoseStamped.h>
 #include <std_msgs/String.h>
 #include <tf/transform_broadcaster.h>
@@ -20,7 +27,7 @@ void command_callback(const std_msgs::String::ConstPtr& comm)
 }
 
 int main(int argc, char **argv) {
-  ros::init(argc, argv, "grasp_exec");
+  ros::init(argc, argv, "gt_grasp_exec");
   ros::NodeHandle nh;
 
   pose_pub =nh.advertise<geometry_msgs::PoseStamped>("target_position_in",1);
