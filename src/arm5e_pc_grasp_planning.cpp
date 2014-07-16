@@ -1,4 +1,3 @@
-//* arm5e point cloud grasp planning
 /** 
  * 3D interface to plan a grasp using a point cloud.
  *
@@ -30,30 +29,8 @@
 
 //TF
 #include <geometry_msgs/PoseStamped.h>
-#include <tf/transform_broadcaster.h>
-
-//TF Broadcaster to visualize target pose, could be a marker also.
-//tf::TransformBroadcaster *broadcaster; 
 
 VispToTF * vispTf;
-
-/*!
-* \brief Publish cMg on the TF tree.
-*
-* It transforms from Visp to Quaternion and Vector in order to create a tranform for TF.
-* 
-* \param cMe       vpHomogeneousMatrix to publish
-*/
-void publish_cMg(vpHomogeneousMatrix cMe){
-
-  //Adapt the visual frame to be the right ee frame.
-  vpHomogeneousMatrix rx(0,0,0,M_PI,0,0); 
-  vpHomogeneousMatrix ry(0,0,0,0,M_PI/2,0);
-  cMe=cMe*rx*ry;	
-  vispTf->resetTransform(cMe);
-  vispTf->publish();
- 
-}
 
 /** Plans a grasp on a point cloud and visualizes it using UWSim
  * Expects the following params to be set in the ROS parameter server:
@@ -62,22 +39,20 @@ void publish_cMg(vpHomogeneousMatrix cMe){
  * eMh: a six-element vector representing the hand frame wrt the end-effector frame. [x y z roll pitch yaw] format
  */
 int main(int argc, char **argv) {
+	
   ros::init(argc, argv, "arm5e_pc_grasp_planning");
   ros::NodeHandle nh;
 
-  //Angulo de agarre
+  //Variables de configuración: ángulo de agarre, distancias...
   double angle, rad, along;
   bool alignedGrasp;
 
   std::string input_basename("output");
   nh.getParam("input_basename", input_basename);
-
   nh.param("alignedGrasp", alignedGrasp, false);
   nh.getParam("angle", angle);
   nh.getParam("rad", rad);
   nh.getParam("along", along);
-
-  /** @todo Put this code in a separate class */
 
   //Point Cloud load
   std::string point_cloud_file(input_basename+std::string(".pcd"));
@@ -88,29 +63,29 @@ int main(int argc, char **argv) {
   reader.read (point_cloud_file, *cloud);
   std::cerr << "PointCloud has: " << cloud->points.size () << " data points." << std::endl;
 
-  //Auto planner
+  //Init planner
   PCAutonomousGraspPlanning planner(angle, rad, along, alignedGrasp, cloud);
   planner.perceive();
 
-  std::cout << "Planned grasp frame with respect to camera is: " << std::endl << planner.get_cMg() << std::endl;
   std::cout << "Starting visualization in UWSim" << std::endl;
 
-  //Viz resources
+  //UWSim lib init
   std::string resources_data_path(".");
   nh.getParam("resources_data_path", resources_data_path);
+
   osgDB::Registry::instance()->getDataFilePathList().push_back(resources_data_path);
   const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
   osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH));
 
   boost::shared_ptr<osg::ArgumentParser> arguments(new osg::ArgumentParser(&argc,argv));
+  
+  //Load UWSim scene
   std::string configfile=resources_data_path+"/arm5e_gripper.xml";
   ConfigFile config(configfile);
-
   SceneBuilder builder(arguments);
   builder.loadScene(config);
-
+  //Load view
   ViewBuilder view(config, &builder, arguments);
-
   osg::ref_ptr<osgGA::TrackballManipulator> tb = new osgGA::TrackballManipulator;
   tb->setHomePosition( osg::Vec3f(0,0,0), osg::Vec3f(0,0,-1), osg::Vec3f(-1,0,0) );
   view.getViewer()->setCameraManipulator( tb );
@@ -124,7 +99,8 @@ int main(int argc, char **argv) {
 
   UWSimGeometry::applyStateSets(pcd_geode.getGeode());
   builder.getScene()->localizedWorld->addChild(pcd_geode.getGeode());
-
+  
+  //Scene dynamic objects
   vpMatrix cMg=planner.get_cMg().transpose();
   osg::Matrixd osg_cMg(cMg.data);
   osg::MatrixTransform *gt=new osg::MatrixTransform(osg_cMg);
@@ -132,33 +108,28 @@ int main(int argc, char **argv) {
   UWSimGeometry::applyStateSets(gt);
   builder.getScene()->localizedWorld->addChild(gt);
 
-
-  //Hand frame wrt end-effector
+  //Hand frame wrt end-effector, allows for visual repositioning.
   vpHomogeneousMatrix eMh=mar_params::paramToVispHomogeneousMatrix(&nh, "eMh");
-  vpHomogeneousMatrix cMe=planner.get_cMg();///*eMh.inverse();
-
-  vispTf = new VispToTF(cMe, "stereo", "grasp");
-  publish_cMg(cMe);
+  vpHomogeneousMatrix cMe=planner.get_cMg();//*eMh.inverse();
 
   while( ros::ok() && !view.getViewer()->done())
   {
+	//Interface
     cv::namedWindow("Grasp configuration", CV_WINDOW_NORMAL );
     cv::createTrackbar( "Radius", "Grasp configuration", &(planner.irad), 100 );
     cv::createTrackbar( "Angle", "Grasp configuration", &(planner.iangle), 360 );
     cv::createTrackbar( "Distance", "Grasp configuration", &(planner.ialong), 100 );
     cv::createTrackbar( "Aligned grasp?", "Grasp configuration", &(planner.ialigned_grasp), 1 );
-
+	//Compute adn display new grasp frame
     planner.recalculate_cMg();
-    cMe=planner.get_cMg();///*eMh.inverse();
+    cMe=planner.get_cMg();//*eMh.inverse();
     osg::Matrixd osg_cMe(cMe.transpose().data);
     gt->setMatrix(osg_cMe);
-    publish_cMg(cMe);
     builder.iauvFile[0]->setVehiclePosition(osg_cMe);
     cv::waitKey(5);
 
     ros::spinOnce();
     view.getViewer()->frame();
   }
-
-  return 1;
+  return 0;
 }

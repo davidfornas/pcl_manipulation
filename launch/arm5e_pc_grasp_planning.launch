@@ -1,7 +1,7 @@
 <launch>
   <rosparam command="load" file="$(find pcl_manipulation)/launch/arm5e_pc_grasp_planning.yaml" />
   
-  <arg name="input_basename" default="cuba_junio_1" />
+  <arg name="input_basename" default="amphoraJuly" />
   <arg name="rad" default="0.5" />
   <arg name="angle" default="3.94" /> 
   <arg name="along" default="0.0" /> 
