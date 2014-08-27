@@ -112,6 +112,10 @@ int main(int argc, char **argv) {
   vpHomogeneousMatrix eMh=mar_params::paramToVispHomogeneousMatrix(&nh, "eMh");
   vpHomogeneousMatrix cMe=planner.get_cMg();//*eMh.inverse();
 
+  // Show muliple possibilities
+  /// @todo 
+  bool multiples=true;
+
   while( ros::ok() && !view.getViewer()->done())
   {
 	//Interface

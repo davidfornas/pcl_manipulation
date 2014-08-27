@@ -8,6 +8,9 @@
 #include <std_msgs/String.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
+#include <mar_robot_arm5e/ARM5Arm.h>
+#include <mar_perception/VispUtils.h>
+
 
 //Target joints publisher
 ros::Publisher js_pub;
@@ -19,16 +22,16 @@ int main(int argc, char **argv) {
   ros::init(argc, argv, "arm5_grasp_exec");
   ros::NodeHandle nh;
 
-  js_pub =nh.advertise<sensor_msgs::JointState>("/uwsim_joint_state",1);
+  ARM5Arm robot(nh, "/uwsim/joint_state", "/uwsim/joint_state_command");
+
+  //js_pub =nh.advertise<sensor_msgs::JointState>("/uwsim/joint_state",1);
   broadcaster = new tf::TransformBroadcaster();
 
   ros::Rate rate(1);
   tf::TransformListener listener;
-
-  //Create ARM5Robot
+  //Create ARM5Robot  
   
-  
-
+  bool found = false;
 
   tf::StampedTransform transform;//Una vez tiene una trasformación la puede publicar contínuamente aunque ya no la encuentre...
   //Esto me permitirai apagar el grasp planning para ejecutar...
@@ -36,22 +39,30 @@ int main(int argc, char **argv) {
 
     try{
       listener.lookupTransform("/kinematic_base", "/cMg", ros::Time(0), transform);//Si falla espero que no modifique trasnform de ningun modo.
-      exception = false;
+      found = true;
     }
     catch (tf::TransformException ex){
-      //ONLY IF NEEDED: ROS_ERROR("%s",ex.what());
-    }    
-    //IK: Check reachabillity...
-    
-    
+      ROS_ERROR("%s",ex.what());
+    } 
+    if(found){   
+      //IK: Check reachabillity...
+      vpHomogeneousMatrix bMg=VispUtils::vispHomogFromTfTransform(tf::Transform(transform));
+ 
+      vpColVector final_joints(5);
+      final_joints=robot.armIK(bMg);
+      vpHomogeneousMatrix bMg_fk=robot.directKinematics(final_joints);
+      std::cout << "Distance: " << (bMg.column(3)-bMg_fk.column(3)).euclideanNorm() << std::endl; 
+      std::cout << "JOINTS: " << final_joints << std::endl;
+    std::cout << "mat: " << bMg_fk << std::endl;
     
     //If found
     //Sleep and execute
     
     
     //FK
-    tf::StampedTransform fk(transform, ros::Time::now(), "/kinematic_base", "/fk_cMg");
+    tf::StampedTransform fk(VispUtils::tfTransFromVispHomog(bMg_fk), ros::Time::now(), "/kinematic_base", "/fk_cMg");
     broadcaster->sendTransform(fk);
+    }
     
     rate.sleep();
     ros::spinOnce();
