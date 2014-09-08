@@ -14,7 +14,8 @@
   <param name="alignedGrasp" value="$(arg alignedGrasp)" />
   <param name="resources_data_path" value="$(find pcl_manipulation)/resources" />
   
-  <!--<node name="grasp_exec" pkg="pcl_manipulation" type="grasp_exec" output="screen" respawn="false"/>-->
+  <node name="arm5_grasp_exec" pkg="pcl_manipulation" type="arm5_grasp_exec" output="screen" respawn="false"/>
+  <node pkg="tf" type="static_transform_publisher" name="stereo_to_kin" args="0 0 0 0 0 0 stereo kinematic_base 100" />
   <node name="arm5e_pc_grasp_planning" pkg="pcl_manipulation" type="arm5e_pc_grasp_planning" output="screen" respawn="false"/>
 </launch>
 
