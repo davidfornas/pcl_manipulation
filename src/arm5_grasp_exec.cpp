@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
     
     
     //FK
-    tf::StampedTransform fk(VispUtils::tfTransFromVispHomog(bMg_fk), ros::Time::now(), "/kinematic_base", "/fk_cMg");
+    tf::StampedTransform fk(VispUtils::tfTransFromVispHomog(bMg_fk), ros::Time::now(), "/kinematic_base", "/reachable_cMg");
     broadcaster->sendTransform(fk);
     }
     

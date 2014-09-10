@@ -30,6 +30,8 @@
 //TF
 #include <geometry_msgs/PoseStamped.h>
 
+#include <tf/transform_listener.h>
+
 VispToTF * vispTf;
 
 /** Plans a grasp on a point cloud and visualizes it using UWSim
@@ -42,6 +44,8 @@ int main(int argc, char **argv) {
 	
   ros::init(argc, argv, "arm5e_pc_grasp_planning");
   ros::NodeHandle nh;
+  //Rechable  
+  tf::TransformListener listener;
 
   //Variables de configuración: ángulo de agarre, distancias...
   double angle, rad, along;
@@ -101,12 +105,22 @@ int main(int argc, char **argv) {
   builder.getScene()->localizedWorld->addChild(pcd_geode.getGeode());
   
   //Scene dynamic objects
+  //Desired position
   vpMatrix cMg=planner.get_cMg().transpose();
   osg::Matrixd osg_cMg(cMg.data);
   osg::MatrixTransform *gt=new osg::MatrixTransform(osg_cMg);
   gt->addChild(UWSimGeometry::createFrame(0.005, 0.1));
   UWSimGeometry::applyStateSets(gt);
   builder.getScene()->localizedWorld->addChild(gt);
+
+  //Reachable position
+  vpMatrix cMg_ik=planner.get_cMg().transpose();
+  osg::Matrixd osg_ik_cMg(cMg.data);
+  osg::MatrixTransform *ik_gt=new osg::MatrixTransform(osg_ik_cMg);
+  ik_gt->addChild(UWSimGeometry::createFrame(0.003, 0.08));
+  UWSimGeometry::applyStateSets(ik_gt);
+  builder.getScene()->localizedWorld->addChild(ik_gt);
+
 
   //Hand frame wrt end-effector, allows for visual repositioning.
   vpHomogeneousMatrix eMh=mar_params::paramToVispHomogeneousMatrix(&nh, "eMh");
@@ -126,10 +140,36 @@ int main(int argc, char **argv) {
     cv::createTrackbar( "Aligned grasp?", "Grasp configuration", &(planner.ialigned_grasp), 1 );
 	//Compute adn display new grasp frame
     planner.recalculate_cMg();
+    
+    //Desired cfg
     cMe=planner.get_cMg();//*eMh.inverse();
     osg::Matrixd osg_cMe(cMe.transpose().data);
     gt->setMatrix(osg_cMe);
     builder.iauvFile[0]->setVehiclePosition(osg_cMe);
+    
+    //Reachable cfg
+    vpHomogeneousMatrix ik_cMe;
+    bool found= false;
+    tf::StampedTransform transform;    
+    //Cheack reachabillity
+    try{
+      listener.lookupTransform("/kinematic_base", "/reachable_cMg", ros::Time(0), transform);//Si falla espero que no modifique trasnform de ningun modo.
+      found = true;
+    }
+    catch (tf::TransformException ex){
+      //ROS_ERROR("%s",ex.what());
+    }
+    if(found){   
+      //IK: Check reachabillity...
+      ik_cMe=VispUtils::vispHomogFromTfTransform(tf::Transform(transform));
+    }    
+    cMe=ik_cMe;
+    osg::Matrixd osg_ik_cMe(cMe.transpose().data);
+    ik_gt->setMatrix(osg_ik_cMe);
+    //TWO HANDS or only frames? builder.iauvFile[0]->setVehiclePosition(osg_cMe);
+        
+    
+    
     cv::waitKey(5);
 
     ros::spinOnce();
