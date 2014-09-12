@@ -100,6 +100,7 @@ int main(int argc, char **argv) {
   //End effector using forward kinematics.
   vpHomogeneousMatrix bMee = directKinematics(q,-1,fksolver);
   v.addTransform(bMee, "base", "ee", "5");
+  std::cout << bMee << std::endl;
 
   ros::Rate rate(15);
 

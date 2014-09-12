@@ -163,13 +163,10 @@ int main(int argc, char **argv) {
       //IK: Check reachabillity...
       ik_cMe=VispUtils::vispHomogFromTfTransform(tf::Transform(transform));
     }    
-    cMe=ik_cMe;
-    osg::Matrixd osg_ik_cMe(cMe.transpose().data);
+    osg::Matrixd osg_ik_cMe(ik_cMe.transpose().data);
     ik_gt->setMatrix(osg_ik_cMe);
     //TWO HANDS or only frames? builder.iauvFile[0]->setVehiclePosition(osg_cMe);
-        
-    
-    
+           
     cv::waitKey(5);
 
     ros::spinOnce();

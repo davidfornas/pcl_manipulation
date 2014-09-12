@@ -50,15 +50,19 @@ int main(int argc, char **argv) {
  
       vpColVector final_joints(5);
       final_joints=robot.armIK(bMg);
-      vpHomogeneousMatrix bMg_fk=robot.directKinematics(final_joints);
+      vpHomogeneousMatrix bMg_fk;
+      vpColVector final_joints2(5);
+      final_joints2[0]=final_joints[0];
+      final_joints2[1]=final_joints[1];
+      final_joints2[2]=final_joints[2];
+      final_joints2[3]=0;
+      final_joints2[4]=0;
+      bMg_fk=robot.directKinematics(final_joints2);
+      std::cout << "mat: " << bMg_fk << std::endl;
       std::cout << "Distance: " << (bMg.column(3)-bMg_fk.column(3)).euclideanNorm() << std::endl; 
-      std::cout << "JOINTS: " << final_joints << std::endl;
-    std::cout << "mat: " << bMg_fk << std::endl;
-    
+      std::cout << "JOINTS: " << final_joints2 << std::endl;    
     //If found
-    //Sleep and execute
-    
-    
+    //Sleep and execute    
     //FK
     tf::StampedTransform fk(VispUtils::tfTransFromVispHomog(bMg_fk), ros::Time::now(), "/kinematic_base", "/reachable_cMg");
     broadcaster->sendTransform(fk);
