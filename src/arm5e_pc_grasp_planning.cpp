@@ -29,22 +29,20 @@
 
 //TF
 #include <geometry_msgs/PoseStamped.h>
-
 #include <tf/transform_listener.h>
-
 VispToTF * vispTf;
 
 /** Plans a grasp on a point cloud and visualizes it using UWSim
  * Expects the following params to be set in the ROS parameter server:
  * input_basename: The full path to the input files without PCD extension, ie. /tmp/scan_2
  * resources_data_path: The path the folder with the models for UWSim
- * eMh: a six-element vector representing the hand frame wrt the end-effector frame. [x y z roll pitch yaw] format
+ * eMh: a six-element vector representing the hand frame wrt the end-effector frame. [x y z roll pitch yaw] format; now UNUSED
  */
 int main(int argc, char **argv) {
 	
   ros::init(argc, argv, "arm5e_pc_grasp_planning");
   ros::NodeHandle nh;
-  //Rechable  
+  //Listen for rechable frame  
   tf::TransformListener listener;
 
   //Variables de configuración: ángulo de agarre, distancias...
@@ -61,7 +59,6 @@ int main(int argc, char **argv) {
   //Point Cloud load
   std::string point_cloud_file(input_basename+std::string(".pcd"));
   osgPCDLoader<pcl::PointXYZRGB> pcd_geode(point_cloud_file);
-
   pcl::PCDReader reader;
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
   reader.read (point_cloud_file, *cloud);
@@ -72,7 +69,6 @@ int main(int argc, char **argv) {
   planner.perceive();
 
   std::cout << "Starting visualization in UWSim" << std::endl;
-
   //UWSim lib init
   std::string resources_data_path(".");
   nh.getParam("resources_data_path", resources_data_path);
@@ -80,7 +76,6 @@ int main(int argc, char **argv) {
   osgDB::Registry::instance()->getDataFilePathList().push_back(resources_data_path);
   const std::string SIMULATOR_DATA_PATH = std::string(getenv("HOME")) + "/.uwsim/data";
   osgDB::Registry::instance()->getDataFilePathList().push_back(std::string(SIMULATOR_DATA_PATH));
-
   boost::shared_ptr<osg::ArgumentParser> arguments(new osg::ArgumentParser(&argc,argv));
   
   //Load UWSim scene
@@ -99,13 +94,13 @@ int main(int argc, char **argv) {
 
   osgViewer::Viewer::Windows windows;
   view.getViewer()->getWindows(windows);
-  windows[0]->setWindowName("UWSim");
+  windows[0]->setWindowName("UWSim Grasp Specification");
 
   UWSimGeometry::applyStateSets(pcd_geode.getGeode());
   builder.getScene()->localizedWorld->addChild(pcd_geode.getGeode());
   
   //Scene dynamic objects
-  //Desired position
+  //Desired position gripper...
   vpMatrix cMg=planner.get_cMg().transpose();
   osg::Matrixd osg_cMg(cMg.data);
   osg::MatrixTransform *gt=new osg::MatrixTransform(osg_cMg);
@@ -153,7 +148,7 @@ int main(int argc, char **argv) {
     tf::StampedTransform transform;    
     //Cheack reachabillity
     try{
-      listener.lookupTransform("/kinematic_base", "/reachable_cMg", ros::Time(0), transform);//Si falla espero que no modifique trasnform de ningun modo.
+      listener.lookupTransform("/stereo", "/reachable_cMg", ros::Time(0), transform);//Si falla espero que no modifique trasnform de ningun modo.
       found = true;
     }
     catch (tf::TransformException ex){
