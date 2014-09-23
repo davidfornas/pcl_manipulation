@@ -138,10 +138,13 @@ int main(int argc, char **argv) {
     
     //Desired cfg
     cMe=planner.get_cMg();//*eMh.inverse();
-    osg::Matrixd osg_cMe(cMe.transpose().data);
-    gt->setMatrix(osg_cMe);
-    builder.iauvFile[0]->setVehiclePosition(osg_cMe);
+    osg::Matrixd osg_cMe_f(cMe.transpose().data);
+    gt->setMatrix(osg_cMe_f);
     
+    cMe=cMe*vpHomogeneousMatrix(0,0,0,0,1.57,0).inverse();
+    osg::Matrixd osg_cMe(cMe.transpose().data);
+    builder.iauvFile[0]->setVehiclePosition(osg_cMe);
+        
     //Reachable cfg
     vpHomogeneousMatrix ik_cMe;
     bool found= false;
@@ -161,6 +164,10 @@ int main(int argc, char **argv) {
     osg::Matrixd osg_ik_cMe(ik_cMe.transpose().data);
     ik_gt->setMatrix(osg_ik_cMe);
     //TWO HANDS or only frames? builder.iauvFile[0]->setVehiclePosition(osg_cMe);
+    ik_cMe=ik_cMe*vpHomogeneousMatrix(0,0,0,0,1.57,0).inverse();
+    osg::Matrixd osg_ik_cMe2(ik_cMe.transpose().data);
+    builder.iauvFile[1]->setVehiclePosition(osg_ik_cMe2);
+           
            
     cv::waitKey(5);
 

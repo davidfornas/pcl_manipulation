@@ -58,14 +58,16 @@ int main(int argc, char **argv) {
       final_joints2[3]=0;
       final_joints2[4]=0;
       bMg_fk=robot.directKinematics(final_joints2);
-      std::cout << "mat: " << bMg_fk << std::endl;
-      std::cout << "Distance: " << (bMg.column(3)-bMg_fk.column(3)).euclideanNorm() << std::endl; 
+      std::cout << "Reach to: " << bMg_fk << std::endl;
+      std::cout << "Desired: " << bMg << std::endl;
+      std::cout << "Distance: " << (bMg.column(4)-bMg_fk.column(4)).euclideanNorm() << std::endl; 
       std::cout << "JOINTS: " << final_joints2 << std::endl;    
     //If found
     //Sleep and execute    
     //FK
     tf::StampedTransform fk(VispUtils::tfTransFromVispHomog(bMg_fk), ros::Time::now(), "/kinematic_base", "/reachable_cMg");
     broadcaster->sendTransform(fk);
+    //IF DISTANCE < 0... move to this position?
     }
     
     rate.sleep();
