@@ -91,7 +91,9 @@ int main(int argc, char **argv) {
 	js.position.push_back(final_joints2[3]);
 	js.name.push_back(std::string("JawOpening"));
 	js.position.push_back(final_joints2[4]);
-    js_pub.publish(js);    
+    
+    //DF Esto sería la posición tal cual, haré un programa que desplace el brazo a la posición correcta...
+    //js_pub.publish(js);    
     
     rate.sleep();
     ros::spinOnce();
