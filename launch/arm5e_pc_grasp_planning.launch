@@ -2,10 +2,10 @@
   <rosparam command="load" file="$(find pcl_manipulation)/launch/arm5e_pc_grasp_planning.yaml" />
   
   <arg name="input_basename" default="amphoraSept" />
-  <arg name="rad" default="0.5" />
-  <arg name="angle" default="3.94" /> 
+  <arg name="rad" default="0.3" />
+  <arg name="angle" default="1.57" /> 
   <arg name="along" default="0.0" /> 
-  <arg name="alignedGrasp" default="false" />
+  <arg name="alignedGrasp" default="true" />
 
   <param name="input_basename" value="$(find pcl_manipulation)/resources/$(arg input_basename)" />
   <param name="rad" value="$(arg rad)" />
@@ -14,9 +14,8 @@
   <param name="alignedGrasp" value="$(arg alignedGrasp)" />
   <param name="resources_data_path" value="$(find pcl_manipulation)/resources" />
   
-  <node name="arm5_grasp_exec" pkg="pcl_manipulation" type="arm5_grasp_exec" output="screen" respawn="false"/>
+  <node name="arm5_grasp_ik" pkg="pcl_manipulation" type="arm5_grasp_ik" output="screen" respawn="false"/>
   <node pkg="tf" type="static_transform_publisher" name="stereo_to_kin" args="-0.2980558034 0.06071263135 0.2551243192 -0.1894883746 0.2325682007 -0.6640417613 0.684875702 kinematic_base stereo 100" />
-  <!--node pkg="tf" type="static_transform_publisher" name="stereo_to_kin2" args="0 0 0 0 0 1.57 middle stereo 100" /-->
   <node name="arm5e_pc_grasp_planning" pkg="pcl_manipulation" type="arm5e_pc_grasp_planning" output="screen" respawn="false"/>
 </launch>
 

@@ -1,11 +1,12 @@
 /** 
- * Grasp execution utility. Moves the ARM5e to the desired cMg, then grasps the object
+ * Grasp command utility. Computes reachabillity for the ARM5e.
  *
  *  Created on: 16/07/2014
  *      Author: dfornas
  */
 #include <sensor_msgs/JointState.h>
 #include <std_msgs/String.h>
+#include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 #include <mar_robot_arm5e/ARM5Arm.h>
 #include <mar_perception/VispUtils.h>
@@ -24,6 +25,7 @@ int main(int argc, char **argv) {
   ARM5Arm robot(nh, "/uwsim/joint_state", "/uwsim/joint_state_command");
 
   //js_pub =nh.advertise<sensor_msgs::JointState>("/uwsim/joint_state",1);
+  broadcaster = new tf::TransformBroadcaster();
 
   ros::Rate rate(1);
   tf::TransformListener listener;
@@ -65,7 +67,8 @@ int main(int argc, char **argv) {
     //Here may -> Sleep and execute    
     //Publish FK of foun joint config
     tf::StampedTransform fk(VispUtils::tfTransFromVispHomog(bMg_fk), ros::Time::now(), "/kinematic_base", "/reachable_cMg");
-   
+    broadcaster->sendTransform(fk);
+    
     }
     
     rate.sleep();

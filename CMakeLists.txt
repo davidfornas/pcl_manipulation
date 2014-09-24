@@ -63,30 +63,33 @@ add_definitions(${VISP_DEFINITIONS})
 INCLUDE_DIRECTORIES(${uwsim_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${OPENSCENEGRAPH_INCLUDE_DIRS} ${LIBXML++_INCLUDE_DIRS} ${VISP_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS} ${BULLET_INCLUDE_DIRS} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${OSGOCEAN_INCLUDE_DIRS})
 LINK_DIRECTORIES(${LIBXML++_LIBRARY_DIRS} ${VISP_LIBRARY_DIRS})
 
-#MANIPULATION
+#PCL Test programs
 add_executable(save_cloud src/save_cloud.cpp)
 add_executable(test_pcl src/test_pcl.cpp)
+
+#Manipulation specific programs
 add_executable(arm5e_pc_grasp_planning src/arm5e_pc_grasp_planning.cpp)
 add_executable(gt_grasp_exec src/gt_grasp_exec.cpp)
+add_executable(arm5_grasp_ik src/arm5_grasp_ik.cpp)
 add_executable(arm5_grasp_exec src/arm5_grasp_exec.cpp)
-
-
-target_link_libraries (arm5e_pc_grasp_planning ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OSGOCEAN_LIBRARIES} vtkHybrid vtkRendering) 
-target_link_libraries (save_cloud ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
-target_link_libraries (test_pcl ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
-target_link_libraries (gt_grasp_exec ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
-target_link_libraries (arm5_grasp_exec ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
 
 #TESTS for MAR and more
 add_executable(VispToTFtest src/VispToTFtest.cpp)
 add_executable(KDLToTFtest src/KDLToTFtest.cpp)
 add_executable(forward_kinematics src/forward_kinematics.cpp)
 
+target_link_libraries (arm5e_pc_grasp_planning ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OSGOCEAN_LIBRARIES} vtkHybrid vtkRendering) 
+target_link_libraries (save_cloud ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
+target_link_libraries (test_pcl ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
+target_link_libraries (gt_grasp_exec ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
+target_link_libraries (arm5_grasp_ik ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
+target_link_libraries (arm5_grasp_exec ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
+
 target_link_libraries(VispToTFtest ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 target_link_libraries(KDLToTFtest ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 target_link_libraries(forward_kinematics ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 
-
+# @todo update
 install(
   TARGETS
     arm5e_pc_grasp_planning
