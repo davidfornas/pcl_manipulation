@@ -82,7 +82,7 @@ int main(int argc, char **argv)
   nh.getParam("gripper_opened", gripper_opened);
 
   //Create ARM5Robot  
-  robot_ = new ARM5Arm(nh, "/uwsim/joint_state", "/uwsim/joint_state_command");
+  robot_ = new ARM5Arm(nh, joint_state, joint_state_command);
 
   ros::Rate rate(20);
   tf::TransformListener listener;
