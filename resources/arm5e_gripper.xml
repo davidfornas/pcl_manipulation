@@ -70,7 +70,7 @@
 
   <vehicle>
     <name>arm5e_gripper_desired</name>
-    <file>arm5e_gripper.urdf</file>
+    <file>arm5e_gripper_red.urdf</file>
     <jointValues>
       <joint> 0.4 </joint>
       <joint> 0.4</joint>

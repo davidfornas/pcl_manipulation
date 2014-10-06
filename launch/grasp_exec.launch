@@ -1,16 +1,21 @@
 <launch>
 
-  <arg name="joint_state" default="/arm5e/joint_state_angle" />
-  <arg name="joint_state_command" default="/arm5e/command_angle" />
+  <!--arg name="joint_state" default="/arm5e/joint_state_angle" /-->
+  <!--arg name="joint_state_command" default="/arm5e/command_angle" /-->
+  <arg name="joint_state" default="/uwsim/joint_state" />
+  <arg name="joint_state_command" default="/uwsim/joint_state_command" />
   <arg name="max_current" default="1.0" /> 
   <arg name="velocity_aperture" default="0.4" /> 
   <arg name="gripper_opened" default="1.0" />
+  <arg name="pick" default="false" />
+  
 
   <param name="joint_state" value="$(arg joint_state)" />
   <param name="joint_state_command" value="$(arg joint_state_command)" />
   <param name="max_current" value="$(arg max_current)" />
   <param name="velocity_aperture" value="$(arg velocity_aperture)" />
   <param name="gripper_opened" value="$(arg gripper_opened)" />
+  <param name="pick" value="$(arg pick)" />
   
   <node name="arm5_grasp_exec" pkg="pcl_manipulation" type="arm5_grasp_exec" output="screen" respawn="false"/>
 

@@ -33,7 +33,7 @@ int main(int argc, char **argv)
   ros::Rate rate(1);
   tf::TransformListener listener;
 
-  bool found = false;
+  bool found = false, found_once=false;
   tf::StampedTransform transform; //Una vez tiene una trasformación la puede publicar contínuamente aunque ya no la encuentre...
   //Esto me permitiria apagar el grasp planning para ejecutar...
   tf::StampedTransform reachable_bMg;
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
     try
     {
       listener.lookupTransform("/kinematic_base", "/cMg", ros::Time(0), transform); //Si falla espero que no modifique trasnform de ningun modo.
-      found = true;
+      found = true; found_once=true;
     }
     catch (const tf::TransformException & ex)
     {
@@ -77,12 +77,12 @@ int main(int argc, char **argv)
       //If found or if distance < threshold
       //Here may -> Sleep and execute
       //Publish FK of foun joint config
-      tf::StampedTransform fk(VispUtils::tfTransFromVispHomog(bMg_fk), ros::Time::now(), "/kinematic_base",
-                              "/reachable_cMg");
+      tf::StampedTransform fk(VispUtils::tfTransFromVispHomog(bMg_fk), ros::Time::now(), "/kinematic_base", "/reachable_cMg");
       reachable_bMg = fk;
     }
     //Always send last valid transform and joint_state
-    broadcaster->sendTransform(reachable_bMg);
+    reachable_bMg.stamp_=ros::Time::now();
+    if(found_once) broadcaster->sendTransform(reachable_bMg);
 
     sensor_msgs::JointState js;
     js.name.push_back(std::string("Slew"));
