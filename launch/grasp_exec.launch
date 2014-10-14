@@ -5,8 +5,10 @@
   <arg name="joint_state" default="/uwsim/joint_state" />
   <arg name="joint_state_command" default="/uwsim/joint_state_command" />
   <arg name="max_current" default="1.0" /> 
-  <arg name="velocity_aperture" default="0.4" /> 
-  <arg name="gripper_opened" default="1.0" />
+  <arg name="velocity_aperture" default="0.15" /> 
+  <arg name="velocity_closure" default="-0.15" /> 
+  <arg name="gripper_opened" default="0.8" />
+  <arg name="gripper_closed" default="0.3" />
   <arg name="pick" default="false" />
   
 
@@ -14,7 +16,9 @@
   <param name="joint_state_command" value="$(arg joint_state_command)" />
   <param name="max_current" value="$(arg max_current)" />
   <param name="velocity_aperture" value="$(arg velocity_aperture)" />
+  <param name="velocity_closure" value="$(arg velocity_closure)" />
   <param name="gripper_opened" value="$(arg gripper_opened)" />
+  <param name="gripper_closed" value="$(arg gripper_closed)" />
   <param name="pick" value="$(arg pick)" />
   
   <node name="arm5_grasp_exec" pkg="pcl_manipulation" type="arm5_grasp_exec" output="screen" respawn="false"/>

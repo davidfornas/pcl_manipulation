@@ -53,9 +53,9 @@ void reachPosition(vpHomogeneousMatrix cMgoal, vpHomogeneousMatrix bMc)
     vpColVector xdot(6);
     xdot = 0;
     vpHomogeneousMatrix eMgoal = cMe.inverse() * cMgoal;
-    xdot[0] = eMgoal[0][3] * 0.7;
-    xdot[1] = eMgoal[1][3] * 0.7;
-    xdot[2] = eMgoal[2][3] * 0.7;
+    xdot[0] = eMgoal[0][3] * 0.5;
+    xdot[1] = eMgoal[1][3] * 0.5;
+    xdot[2] = eMgoal[2][3] * 0.5;
     robot_->setCartesianVelocity(xdot);
     ros::spinOnce();
 
@@ -70,13 +70,15 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
 
   std::string joint_state, joint_state_command;
-  double max_current, velocity_aperture, gripper_opened, pick;
+  double max_current, velocity_aperture, velocity_closure, gripper_opened, gripper_closed, pick;
 
   nh.getParam("joint_state", joint_state);
   nh.getParam("joint_state_command", joint_state_command);
   nh.getParam("max_current", max_current);
   nh.getParam("velocity_aperture", velocity_aperture);
+  nh.getParam("velocity_closure", velocity_closure);
   nh.getParam("gripper_opened", gripper_opened);
+  nh.getParam("gripper_closed", gripper_closed);
   nh.getParam("pick", pick);
 
   //Create ARM5Robot  
@@ -123,31 +125,18 @@ int main(int argc, char **argv)
     vpHomogeneousMatrix cMgoal = VispUtils::vispHomogFromTfTransform(tf::Transform(transform2));
     //Mover a posición a través de movimiento lineal cartesiano.
     reachPosition(cMgoal, bMc);
-    ROS_DEBUG("New position reached");
-
-    //ROS_INFO("Starting position reached, moving forward (Z Axis)");
-    //Coger el objeto
-    //reachCloseposition... Currently there is any reachabillity check so the distance should be
-    //near enough and the previous goal away from the workspace limits.
-    //cMgoal = cMgoal * vpHomogeneousMatrix(0, 0, 0.2, 0, 0, 0);
-    //reachPosition(cMgoal, bMc);
-    //ROS_INFO("Close position reached, Closing the gripper (until a current is sensed)");
-    openGripper(velocity_aperture, gripper_opened, max_current);
-    //ROS_INFO("Finished. Going home now...");
-    //cMgoal = cMgoal * vpHomogeneousMatrix(0, 0, -0.4, 0, 0, 0);
-    //reachPosition(cMgoal, bMc);
-    //ROS_INFO("The end");
+    ROS_INFO("Starting position reached");
 
     if (pick)
     {
-      ROS_INFO("Starting position reached, moving forward (Z Axis)");
+      ROS_INFO("Moving forward (Z Axis)");
       //Coger el objeto
       //reachCloseposition... Currently there is any reachabillity check so the distance should be
       //near enough and the previous goal away from the workspace limits.
-      vpHomogeneousMatrix new_cMgoal = cMgoal * vpHomogeneousMatrix(0, 0, 0.3, 0, 0, 0);
+      vpHomogeneousMatrix new_cMgoal = cMgoal * vpHomogeneousMatrix(0, 0, 0.12, 0, 0, 0);
       reachPosition(new_cMgoal, bMc);
       ROS_INFO("Close position reached, Closing the gripper (until a current is sensed)");
-      openGripper(velocity_aperture, 0.2, max_current);
+      openGripper(velocity_closure, gripper_closed, max_current);
       ROS_INFO("Finished. Going home now...");
       //cMgoal = cMgoal * vpHomogeneousMatrix(0, 0, -0.4, 0, 0, 0);
       reachPosition(cMgoal, bMc);

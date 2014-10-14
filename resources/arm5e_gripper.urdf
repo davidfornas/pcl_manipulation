@@ -16,7 +16,7 @@
   <joint name="base_to_part4_base" type="fixed">
     <parent link="base"/>
     <child link="part4_base"/>
-    <origin rpy="0 0 0" xyz="-0.3 0 0"/> <-- eMh offset defined here for visual representation -->
+    <origin rpy="0 0 0" xyz="-0.13 0 0"/> <-- eMh offset defined here for visual representation -->
   </joint>
   
 
