@@ -1,0 +1,28 @@
+<launch>
+  <!-- Should be calculate online with ARMarkers -->
+  <!-- node pkg="tf" type="static_transform_publisher" name="stereo_to_kin" args="-0.2980558034 0.06071263135 0.2551243192 -0.1894883746 0.2325682007 -0.6640417613 0.684875702 kinematic_base stereo 100" /-->
+  <!-- node pkg="tf" type="static_transform_publisher" name="stereo_to_kin_sim" args="-0.500 0.060 -0.130 0.001 0.001 -0.707 0.707 kinematic_base stereo 100" /-->
+  <node pkg="tf" type="static_transform_publisher" name="stereo_to_kin_sim" args="-0.400 0.060 -0.030 -0.174 0.176 -0.685 0.685 kinematic_base stereo 100" />
+  
+  
+  
+  <rosparam command="load" file="$(find pcl_manipulation)/launch/arm5e_pc_grasp_planning.yaml" />
+  
+  <arg name="input_basename" default="amphoraSimOct2" />
+  <arg name="rad" default="0.3" />
+  <arg name="angle" default="1.57" /> 
+  <arg name="along" default="0.0" /> 
+  <arg name="alignedGrasp" default="true" />
+
+  <param name="input_basename" value="$(find pcl_manipulation)/resources/$(arg input_basename)" />
+  <param name="rad" value="$(arg rad)" />
+  <param name="angle" value="$(arg angle)" />
+  <param name="along" value="$(arg along)" />
+  <param name="alignedGrasp" value="$(arg alignedGrasp)" />
+  <param name="resources_data_path" value="$(find pcl_manipulation)/resources" />
+  
+  <node name="arm5e_pc_grasp_planning" pkg="pcl_manipulation" type="list_test" output="screen" respawn="false"/>
+  
+</launch>
+
+
