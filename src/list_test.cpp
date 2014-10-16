@@ -36,12 +36,13 @@ VispToTF * vispTf;
 
 struct GraspHypothesis{
   vpHomogeneousMatrix cMg, cMg_ik;
-  double score;
+  double distance_score, distance_ik_score, angle_ik_score, angle_axis_score, overall_score;
 };
 
 bool sortByScore(GraspHypothesis a, GraspHypothesis b)
 {
-        return a.score < b.score;
+        //Using if-else statements could be better to compare. Sets priority better.
+        return a.overall_score < b.overall_score;
 }
 
 double angle(vpColVector a, vpColVector b)
@@ -177,41 +178,47 @@ int main(int argc, char **argv)
     //std::cout << "Reachable position joints: " << std::endl << final_joints2 << std::endl;
     g.cMg_ik=bMc.inverse()*bMg_fk;
     //Compute score
-    double dist=(g.cMg.column(4) - g.cMg_ik.column(4)).euclideanNorm();
-    double ang=angle(bMg.column(3), bMg_fk.column(3));
-    g.score=dist*10+ang;
+    g.distance_ik_score=(g.cMg.column(4) - g.cMg_ik.column(4)).euclideanNorm();
+    g.angle_ik_score=abs(angle(g.cMg.column(3), g.cMg_ik.column(3)));
+    g.angle_axis_score=abs(abs(angle(planner.cMo.column(2), g.cMg_ik.column(3)))-1);//Angle between cylinder axis and grasp axis.1 rad is preferred
+    g.distance_score=abs((planner.cMo.column(4) - g.cMg_ik.column(4)).euclideanNorm()-0.35);//35cm is preferred
+    g.overall_score=g.distance_ik_score*100+g.angle_ik_score*10+g.angle_axis_score+g.distance_score*2;
     grasps.push_back(g);
   }
   std::sort(grasps.begin(), grasps.end(), sortByScore);
 
 
 
-  int index=0, old_index;
+  int index=0;
   while (ros::ok() && !view.getViewer()->done())
   {
-    if(old_index!=index)std::cout<<"HAS CHANGED"<<std::endl;
-
     cv::namedWindow("Grasp generator", CV_WINDOW_NORMAL);
-    cv::createTrackbar("Grasp", "Grasp generator", &index, grasps.size());
-    std::ostringstream s;
-    s << "Score " << grasps[index].score;
-    std::string a(s.str());
-    cv::Mat image = cv::Mat::zeros( 400, 400, CV_8UC3 );
-    cv::putText(image, a, cv::Point(50,100), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,200,200), 4);
-     imshow("Grasp generator",image);
+    cv::createTrackbar("Grasp", "Grasp generator", &index, grasps.size()-1>50? 50:grasps.size()-1); //Show all  remove :? grasps.size()-1
+    std::ostringstream s1,s2,s3,s4,s5;
+    s1 << "Distance score: " << grasps[index].distance_ik_score;
+    s2 << "Angle ik score: " << grasps[index].angle_ik_score;
+    s3 << "Ang axis score: " << grasps[index].angle_axis_score;
+    s4 << "Distance to object: " << grasps[index].distance_score;
+    s5 << "Overall score:" << grasps[index].overall_score;
+    std::string a1(s1.str()), a2(s2.str()), a3(s3.str()), a4(s4.str()), a5(s5.str());
+    cv::Mat image = cv::Mat::zeros( 300, 600, CV_8UC3 );
+    cv::putText(image, a1, cv::Point(30,50), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,0,200), 4);
+    cv::putText(image, a2, cv::Point(30,85), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,0,200), 4);
+    cv::putText(image, a3, cv::Point(30,120), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,0,200), 4);
+    cv::putText(image, a4, cv::Point(30,155), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,0,200), 4);
+    cv::putText(image, a5, cv::Point(30,190), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,0,200), 4);
+    imshow("Grasp generator", image);
 
     //cv::displayOverlay("Grasp generator", "TESTING", 0);
     //Desired cfg
-
-          cMe = grasps[index].cMg;
-          ik_cMe = grasps[index].cMg_ik;
+    cMe = grasps[index].cMg;
+    ik_cMe = grasps[index].cMg_ik;
     osg::Matrixd osg_cMe_f(cMe.transpose().data);
     gt->setMatrix(osg_cMe_f);
 
     cMe = cMe * vpHomogeneousMatrix(0, 0, 0, 0, 1.57, 0).inverse();
     osg::Matrixd osg_cMe(cMe.transpose().data);
     builder.iauvFile[0]->setVehiclePosition(osg_cMe);
-
 
     osg::Matrixd osg_ik_cMe(ik_cMe.transpose().data);
     ik_gt->setMatrix(osg_ik_cMe);
@@ -224,8 +231,7 @@ int main(int argc, char **argv)
 
     ros::spinOnce();
     view.getViewer()->frame();
-    old_index=index;
-    //count++;
+
   }
   return 0;
 }

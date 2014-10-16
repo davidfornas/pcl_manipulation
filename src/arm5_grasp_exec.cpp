@@ -129,6 +129,10 @@ int main(int argc, char **argv)
 
     if (pick)
     {
+      ROS_INFO("Opening gripper");
+
+      openGripper(velocity_aperture, gripper_opened, max_current);
+
       ROS_INFO("Moving forward (Z Axis)");
       //Coger el objeto
       //reachCloseposition... Currently there is any reachabillity check so the distance should be
