@@ -8,7 +8,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/><!-- rpy 0 0 0 -->
       <geometry>
-        <mesh filename="robot/ARM5E/ARM5E_part4_base_green.osg"/>
+        <mesh filename="robot/ARM5E/ARM5E_part4_base_red.osg"/>
       </geometry>
     </visual>
   </link>
