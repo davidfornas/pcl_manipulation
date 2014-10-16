@@ -70,7 +70,8 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
 
   std::string joint_state, joint_state_command;
-  double max_current, velocity_aperture, velocity_closure, gripper_opened, gripper_closed, pick;
+  double max_current, velocity_aperture, velocity_closure, gripper_opened, gripper_closed;
+  bool pick;
 
   nh.getParam("joint_state", joint_state);
   nh.getParam("joint_state_command", joint_state_command);
@@ -133,19 +134,21 @@ int main(int argc, char **argv)
 
       openGripper(velocity_aperture, gripper_opened, max_current);
 
-      ROS_INFO("Moving forward (Z Axis)");
-      //Coger el objeto
+      ROS_INFO("Moving forward 12 cms (Z Axis)");
       //reachCloseposition... Currently there is any reachabillity check so the distance should be
       //near enough and the previous goal away from the workspace limits.
       vpHomogeneousMatrix new_cMgoal = cMgoal * vpHomogeneousMatrix(0, 0, 0.12, 0, 0, 0);
       reachPosition(new_cMgoal, bMc);
+
       ROS_INFO("Close position reached, Closing the gripper (until a current is sensed)");
       openGripper(velocity_closure, gripper_closed, max_current);
+
       ROS_INFO("Finished. Going home now...");
       //cMgoal = cMgoal * vpHomogeneousMatrix(0, 0, -0.4, 0, 0, 0);
       reachPosition(cMgoal, bMc);
-      ROS_INFO("The end");
 
+      ROS_INFO("Grasp ended");
+      pick=false;//This avoids dropping the amphora in real scenarios.One time only program.
     }
 
     rate.sleep();

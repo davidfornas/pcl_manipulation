@@ -72,10 +72,8 @@ int main(int argc, char **argv)
       //std::cout << "Desired: " << bMg << std::endl;
       std::cout << "Distance to desired cMg: " << (bMg.column(4) - bMg_fk.column(4)).euclideanNorm() << std::endl;
       std::cout << "Angle to desired cMg: " << angle(bMg.column(3), bMg_fk.column(3)) << std::endl;
-
       std::cout << "Reachable position joints: " << std::endl << final_joints2 << std::endl;
-      //If found or if distance < threshold
-      //Here may -> Sleep and execute
+
       //Publish FK of foun joint config
       tf::StampedTransform fk(VispUtils::tfTransFromVispHomog(bMg_fk), ros::Time::now(), "/kinematic_base", "/reachable_cMg");
       reachable_bMg = fk;
@@ -95,9 +93,6 @@ int main(int argc, char **argv)
     js.position.push_back(final_joints2[3]);
     js.name.push_back(std::string("JawOpening"));
     js.position.push_back(final_joints2[4]);
-
-    //DF Esto sería la posición tal cual, haré un programa que desplace el brazo a la posición correcta...
-    //js_pub.publish(js);    
 
     rate.sleep();
     ros::spinOnce();

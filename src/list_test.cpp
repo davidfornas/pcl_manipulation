@@ -136,8 +136,6 @@ int main(int argc, char **argv)
   vpHomogeneousMatrix eMh = mar_params::paramToVispHomogeneousMatrix(&nh, "eMh");
   vpHomogeneousMatrix cMe = planner.get_cMg(), ik_cMe; //*eMh.inverse();
   double count=0;
-  //  for (std::list<vpHomogeneousMatrix>::const_iterator ci = planner.cMg_list.begin(); ci != planner.cMg_list.end(); ++ci)
-  //           cout << *ci << " ";
 
   tf::StampedTransform transform;
   bool found = false;
@@ -171,29 +169,24 @@ int main(int argc, char **argv)
     final_joints2[3] = 1.57;
     final_joints2[4] = 0;
     bMg_fk = robot.directKinematics(final_joints2);
-    //std::cout << "Reach to: " << bMg_fk << std::endl;
-    //std::cout << "Desired: " << bMg << std::endl;
-    //std::cout << "Distance to desired cMg: " << (bMg.column(4) - bMg_fk.column(4)).euclideanNorm() << std::endl;
-    //std::cout << "Angle to desired cMg: " << angle(bMg.column(3), bMg_fk.column(3)) << std::endl;
-    //std::cout << "Reachable position joints: " << std::endl << final_joints2 << std::endl;
     g.cMg_ik=bMc.inverse()*bMg_fk;
     //Compute score
     g.distance_ik_score=(g.cMg.column(4) - g.cMg_ik.column(4)).euclideanNorm();
     g.angle_ik_score=abs(angle(g.cMg.column(3), g.cMg_ik.column(3)));
     g.angle_axis_score=abs(abs(angle(planner.cMo.column(2), g.cMg_ik.column(3)))-1);//Angle between cylinder axis and grasp axis.1 rad is preferred
     g.distance_score=abs((planner.cMo.column(4) - g.cMg_ik.column(4)).euclideanNorm()-0.35);//35cm is preferred
-    g.overall_score=g.distance_ik_score*100+g.angle_ik_score*10+g.angle_axis_score+g.distance_score*2;
+    g.overall_score=g.distance_ik_score*100+g.angle_ik_score*10+g.angle_axis_score+g.distance_score*2;//Should be argued. Know is only a matter of priority.
     grasps.push_back(g);
   }
   std::sort(grasps.begin(), grasps.end(), sortByScore);
 
-
-
   int index=0;
   while (ros::ok() && !view.getViewer()->done())
   {
+    //UI Code
     cv::namedWindow("Grasp generator", CV_WINDOW_NORMAL);
     cv::createTrackbar("Grasp", "Grasp generator", &index, grasps.size()-1>50? 50:grasps.size()-1); //Show all  remove :? grasps.size()-1
+    //UI Text Block
     std::ostringstream s1,s2,s3,s4,s5;
     s1 << "Distance score: " << grasps[index].distance_ik_score;
     s2 << "Angle ik score: " << grasps[index].angle_ik_score;
@@ -209,26 +202,23 @@ int main(int argc, char **argv)
     cv::putText(image, a5, cv::Point(30,190), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,0,200), 4);
     imshow("Grasp generator", image);
 
-    //cv::displayOverlay("Grasp generator", "TESTING", 0);
-    //Desired cfg
+    //Display cMg and cMg_ik
     cMe = grasps[index].cMg;
     ik_cMe = grasps[index].cMg_ik;
+
     osg::Matrixd osg_cMe_f(cMe.transpose().data);
     gt->setMatrix(osg_cMe_f);
-
     cMe = cMe * vpHomogeneousMatrix(0, 0, 0, 0, 1.57, 0).inverse();
     osg::Matrixd osg_cMe(cMe.transpose().data);
     builder.iauvFile[0]->setVehiclePosition(osg_cMe);
 
     osg::Matrixd osg_ik_cMe(ik_cMe.transpose().data);
     ik_gt->setMatrix(osg_ik_cMe);
-    //TWO HANDS or only frames? builder.iauvFile[0]->setVehiclePosition(osg_cMe);
     ik_cMe = ik_cMe * vpHomogeneousMatrix(0, 0, 0, 0, 1.57, 0).inverse();
     osg::Matrixd osg_ik_cMe2(ik_cMe.transpose().data);
     builder.iauvFile[1]->setVehiclePosition(osg_ik_cMe2);
 
     cv::waitKey(5);
-
     ros::spinOnce();
     view.getViewer()->frame();
 
