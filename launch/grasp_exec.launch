@@ -1,16 +1,16 @@
 <launch>
 
   <!-- REAL ARM -->
-  <!--arg name="joint_state" default="/arm5e/joint_state_angle" /-->
-  <!--arg name="joint_state_command" default="/arm5e/command_angle" /-->
+  <arg name="joint_state" default="/arm5e/joint_state_angle" />
+  <arg name="joint_state_command" default="/arm5e/command_angle" />
   
   <!-- SIMULATED ARM -->
-  <arg name="joint_state" default="/uwsim/joint_state" />
-  <arg name="joint_state_command" default="/uwsim/joint_state_command" />
+  <!--arg name="joint_state" default="/uwsim/joint_state" /-->
+  <!--arg name="joint_state_command" default="/uwsim/joint_state_command" /-->
 
-  <arg name="max_current" default="0.8" /> 
-  <arg name="velocity_aperture" default="0.15" /> 
-  <arg name="velocity_closure" default="-0.15" /> 
+  <arg name="max_current" default="0.9" /> 
+  <arg name="velocity_aperture" default="0.22" /> 
+  <arg name="velocity_closure" default="-0.22" /> 
   <arg name="gripper_opened" default="0.8" />
   <arg name="gripper_closed" default="0.3" />
   <arg name="pick" default="true" />  

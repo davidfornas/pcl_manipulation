@@ -137,7 +137,7 @@ int main(int argc, char **argv)
       ROS_INFO("Moving forward 12 cms (Z Axis)");
       //reachCloseposition... Currently there is any reachabillity check so the distance should be
       //near enough and the previous goal away from the workspace limits.
-      vpHomogeneousMatrix new_cMgoal = cMgoal * vpHomogeneousMatrix(0, 0, 0.12, 0, 0, 0);
+      vpHomogeneousMatrix new_cMgoal = cMgoal * vpHomogeneousMatrix(0, 0, 0.08, 0, 0, 0);
       reachPosition(new_cMgoal, bMc);
 
       ROS_INFO("Close position reached, Closing the gripper (until a current is sensed)");
@@ -149,6 +149,7 @@ int main(int argc, char **argv)
 
       ROS_INFO("Grasp ended");
       pick=false;//This avoids dropping the amphora in real scenarios.One time only program.
+      return 0;
     }
 
     rate.sleep();
