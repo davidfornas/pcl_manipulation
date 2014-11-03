@@ -36,9 +36,10 @@ int main(int argc, char **argv)
   bool found = false, found_once=false;
   tf::StampedTransform transform; //Una vez tiene una trasformación la puede publicar contínuamente aunque ya no la encuentre...
   //Esto me permitiria apagar el grasp planning para ejecutar...
-  tf::StampedTransform reachable_bMg;
-  vpColVector final_joints(5);
+  tf::StampedTransform reachable_bMg,  reachable_end_bMg;
+  vpColVector final_joints(5), final_joints_end(5);
 
+  double distance=5;
   while (nh.ok())
   {
 
@@ -53,6 +54,7 @@ int main(int argc, char **argv)
       //ROS_ERROR("%s",ex.what());
     }
     vpColVector final_joints2(5);
+    vpHomogeneousMatrix bMg_fk;
     if (found)
     {
       //IK: Check reachabillity...
@@ -60,7 +62,6 @@ int main(int argc, char **argv)
 
       vpColVector final_joints(5);
       final_joints = robot.armIK(bMg);
-      vpHomogeneousMatrix bMg_fk;
 
       final_joints2[0] = final_joints[0];
       final_joints2[1] = final_joints[1];
@@ -82,6 +83,32 @@ int main(int argc, char **argv)
     reachable_bMg.stamp_=ros::Time::now();
     if(found_once) broadcaster->sendTransform(reachable_bMg);
 
+
+    //DF: part 2 end
+    vpColVector final_joints2_end(5);
+    if (found)
+    {
+      //IK: Check reachabillity...
+      vpHomogeneousMatrix bMg_end = bMg_fk * vpHomogeneousMatrix(0, 0, distance/100.0, 0, 0, 0);
+
+      vpColVector final_joint_ends(5);
+      final_joints_end = robot.armIK(bMg_end);
+      vpHomogeneousMatrix bMg_fk_end;
+
+      final_joints2_end[0] = final_joints_end[0];
+      final_joints2_end[1] = final_joints_end[1];
+      final_joints2_end[2] = final_joints_end[2];
+      final_joints2_end[3] = 1.57;
+      final_joints2_end[4] = 0;
+      bMg_fk_end = robot.directKinematics(final_joints2_end);
+      //Publish FK of foun joint config
+      tf::StampedTransform fk_end(VispUtils::tfTransFromVispHomog(bMg_fk_end), ros::Time::now(), "/kinematic_base", "/reachable_cMg_end");
+      reachable_end_bMg = fk_end;
+    }
+    //Always send last valid transform and joint_state
+    reachable_end_bMg.stamp_=ros::Time::now();
+    if(found_once) broadcaster->sendTransform(reachable_end_bMg);
+
     sensor_msgs::JointState js;
     js.name.push_back(std::string("Slew"));
     js.position.push_back(final_joints2[0]);
@@ -96,6 +123,7 @@ int main(int argc, char **argv)
 
     rate.sleep();
     ros::spinOnce();
+    nh.getParam("distance", distance);
   }
   return 0;
 }

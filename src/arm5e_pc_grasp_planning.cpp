@@ -117,6 +117,14 @@ int main(int argc, char **argv)
   UWSimGeometry::applyStateSets(ik_gt);
   builder.getScene()->localizedWorld->addChild(ik_gt);
 
+  //Reachable position end
+  vpMatrix cMg_ik_end = planner.get_cMg().transpose();
+  osg::Matrixd osg_ik_cMg_end(cMg.data);
+  osg::MatrixTransform *ik_gt_end = new osg::MatrixTransform(osg_ik_cMg_end);
+  ik_gt_end->addChild(UWSimGeometry::createFrame(0.003, 0.08));
+  UWSimGeometry::applyStateSets(ik_gt_end);
+  builder.getScene()->localizedWorld->addChild(ik_gt_end);
+
   //Hand frame wrt end-effector, allows for visual repositioning.
   vpHomogeneousMatrix eMh = mar_params::paramToVispHomogeneousMatrix(&nh, "eMh");
   vpHomogeneousMatrix cMe = planner.get_cMg(); //*eMh.inverse();
@@ -124,6 +132,9 @@ int main(int argc, char **argv)
   // Show muliple possibilities
   /// @todo 
   bool multiples = true;
+
+  //Distance to reach
+  int distance=8;
 
   while (ros::ok() && !view.getViewer()->done())
   {
@@ -133,6 +144,7 @@ int main(int argc, char **argv)
     cv::createTrackbar("Angle", "Grasp configuration", &(planner.iangle), 360);
     cv::createTrackbar("Distance", "Grasp configuration", &(planner.ialong), 100);
     cv::createTrackbar("Aligned grasp?", "Grasp configuration", &(planner.ialigned_grasp), 1);
+    cv::createTrackbar("A. Distance", "Grasp configuration", &distance, 20);
     //Compute adn display new grasp frame
     planner.recalculate_cMg();
 
@@ -171,8 +183,34 @@ int main(int argc, char **argv)
     osg::Matrixd osg_ik_cMe2(ik_cMe.transpose().data);
     builder.iauvFile[1]->setVehiclePosition(osg_ik_cMe2);
 
-    cv::waitKey(5);
+    //Reachable end positioncfg
+    vpHomogeneousMatrix ik_cMe_end;
+    found = false;
+    tf::StampedTransform transform2;
+    //Cheack reachabillity
+    try
+    {
+      listener.lookupTransform("/stereo", "/reachable_cMg_end", ros::Time(0), transform2); //Si falla espero que no modifique trasnform de ningun modo.
+      found = true;
+    }
+    catch (const tf::TransformException & ex)
+    {
+      //ROS_ERROR("%s",ex.what());
+    }
+    if (found)
+    {
+      //IK: Check reachabillity...
+      ik_cMe_end = VispUtils::vispHomogFromTfTransform(tf::Transform(transform2));
+    }
+    osg::Matrixd osg_ik_cMe_end(ik_cMe_end.transpose().data);
+    ik_gt_end->setMatrix(osg_ik_cMe_end);
+    //TWO HANDS or only frames? builder.iauvFile[0]->setVehiclePosition(osg_cMe);
+    ik_cMe_end = ik_cMe_end * vpHomogeneousMatrix(0, 0, 0, 0, 1.57, 0).inverse();
+    osg::Matrixd osg_ik_cMe2_end(ik_cMe_end.transpose().data);
+    builder.iauvFile[2]->setVehiclePosition(osg_ik_cMe2_end);
 
+    cv::waitKey(5);
+    nh.setParam("distance", distance);
     ros::spinOnce();
     view.getViewer()->frame();
   }
