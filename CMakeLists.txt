@@ -73,6 +73,7 @@ add_executable(list_test src/list_test.cpp)
 add_executable(gt_grasp_exec src/gt_grasp_exec.cpp)
 add_executable(arm5_grasp_ik src/arm5_grasp_ik.cpp)
 add_executable(arm5_grasp_exec src/arm5_grasp_exec.cpp)
+add_executable(benchmark src/benchmark.cpp)
 
 #TESTS for MAR and more
 add_executable(VispToTFtest src/VispToTFtest.cpp)
@@ -92,6 +93,8 @@ target_link_libraries (arm5_grasp_exec ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBR
 target_link_libraries(VispToTFtest ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 target_link_libraries(KDLToTFtest ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 target_link_libraries(forward_kinematics ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+
+target_link_libraries(benchmark ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 
 # @todo update
 install(

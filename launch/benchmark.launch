@@ -1,0 +1,17 @@
+<launch>
+  <arg name="input_basename" default="test" />
+  <arg name="rad" default="0.3" />
+  <arg name="angle" default="1.57" /> 
+  <arg name="along" default="0.0" /> 
+  <arg name="alignedGrasp" default="true" />
+
+  <param name="input_basename" value="$(find pcl_manipulation)/resources/$(arg input_basename)" />
+  <param name="rad" value="$(arg rad)" />
+  <param name="angle" value="$(arg angle)" />
+  <param name="along" value="$(arg along)" />
+  <param name="alignedGrasp" value="$(arg alignedGrasp)" />
+  <node name="benchmark" pkg="pcl_manipulation" type="benchmark" output="screen" respawn="false"/>
+  
+</launch>
+
+
