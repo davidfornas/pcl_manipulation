@@ -1,5 +1,5 @@
 <launch>
-  <arg name="input_basename" default="test" />
+  <arg name="input_basename" default="picher" />
   <arg name="rad" default="0.3" />
   <arg name="angle" default="1.57" /> 
   <arg name="along" default="0.0" /> 

@@ -8,7 +8,7 @@
   <!--arg name="joint_state" default="/uwsim/joint_state" /-->
   <!--arg name="joint_state_command" default="/uwsim/joint_state_command" /-->
 
-  <arg name="max_current" default="0.9" /> 
+  <arg name="max_current" default="1.0" /> 
   <arg name="velocity_aperture" default="0.22" /> 
   <arg name="velocity_closure" default="-0.22" /> 
   <arg name="gripper_opened" default="0.8" />

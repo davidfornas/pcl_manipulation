@@ -67,11 +67,6 @@ int main(int argc, char **argv)
 
   //Init planner
   PCAutonomousGraspPlanning planner(angle, rad, along, alignedGrasp, cloud);
-
-  //Jar parameters
-  //planner.setPlaneSegmentationParams(0.09, 200);
-  //planner.setCylinderSegmentationParams(0.06, 10000, 0.1);
-
   planner.perceive();
 
   std::cout << "Starting visualization in UWSim" << std::endl;
@@ -85,7 +80,7 @@ int main(int argc, char **argv)
   boost::shared_ptr<osg::ArgumentParser> arguments(new osg::ArgumentParser(&argc, argv));
 
   //Load UWSim scene
-  std::string configfile = resources_data_path + "/arm5e_gripper.xml";
+  std::string configfile = resources_data_path + "/arm5e_arm.xml";
   ConfigFile config(configfile);
   SceneBuilder builder(arguments);
   builder.loadScene(config);
@@ -114,6 +109,7 @@ int main(int argc, char **argv)
   UWSimGeometry::applyStateSets(gt);
   builder.getScene()->localizedWorld->addChild(gt);
 
+  /*
   //Reachable position
   vpMatrix cMg_ik = planner.get_cMg().transpose();
   osg::Matrixd osg_ik_cMg(cMg.data);
@@ -132,7 +128,34 @@ int main(int argc, char **argv)
 
   //Hand frame wrt end-effector, allows for visual repositioning.
   vpHomogeneousMatrix eMh = mar_params::paramToVispHomogeneousMatrix(&nh, "eMh");
+  */
   vpHomogeneousMatrix cMe = planner.get_cMg(); //*eMh.inverse();
+
+  vpHomogeneousMatrix ik_cMe;
+      bool found = false;
+      tf::StampedTransform transform;
+      //Cheack reachabillity
+      try
+      {
+        listener.lookupTransform("/stereo", "/kinematic_base", ros::Time(0), transform); //Si falla espero que no modifique trasnform de ningun modo.
+        found = true;
+      }
+      catch (const tf::TransformException & ex)
+      {
+        ROS_ERROR("%s",ex.what());
+      }
+      if (found)
+      {
+        //IK: Check reachabillity...
+        ik_cMe = VispUtils::vispHomogFromTfTransform(tf::Transform(transform));
+      }
+      osg::Matrixd osg_ik_cMe(ik_cMe.transpose().data);
+      //ik_gt->setMatrix(osg_ik_cMe);
+      //TWO HANDS or only frames? builder.iauvFile[0]->setVehiclePosition(osg_cMe);
+      //ik_cMe = ik_cMe * vpHomogeneousMatrix(0, 0, 0, 0, 1.57, 0).inverse();
+      osg::Matrixd osg_ik_cMe2(ik_cMe.transpose().data);
+      builder.iauvFile[1]->setVehiclePosition(osg_ik_cMe2);
+
 
   // Show muliple possibilities
   /// @todo 
@@ -162,6 +185,7 @@ int main(int argc, char **argv)
     osg::Matrixd osg_cMe(cMe.transpose().data);
     builder.iauvFile[0]->setVehiclePosition(osg_cMe);
 
+    /*
     //Reachable cfg
     vpHomogeneousMatrix ik_cMe;
     bool found = false;
@@ -213,7 +237,7 @@ int main(int argc, char **argv)
     ik_cMe_end = ik_cMe_end * vpHomogeneousMatrix(0, 0, 0, 0, 1.57, 0).inverse();
     osg::Matrixd osg_ik_cMe2_end(ik_cMe_end.transpose().data);
     builder.iauvFile[2]->setVehiclePosition(osg_ik_cMe2_end);
-
+    */
     cv::waitKey(5);
     nh.setParam("distance", distance);
     ros::spinOnce();

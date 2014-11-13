@@ -40,7 +40,7 @@ void openGripper(double velocity, double aperture, double current)
 
 ///Moved from GRASPER
 ///Reach a position with respect to a given 
-void reachPosition(vpHomogeneousMatrix cMgoal, vpHomogeneousMatrix bMc)
+void reachPosition(vpHomogeneousMatrix cMgoal, vpHomogeneousMatrix bMc, double current)
 {
   vpHomogeneousMatrix bMe, cMe;
   //joint_offset_->get_bMc(bMc);
@@ -53,15 +53,16 @@ void reachPosition(vpHomogeneousMatrix cMgoal, vpHomogeneousMatrix bMc)
     vpColVector xdot(6);
     xdot = 0;
     vpHomogeneousMatrix eMgoal = cMe.inverse() * cMgoal;
-    xdot[0] = eMgoal[0][3] * 0.5;
-    xdot[1] = eMgoal[1][3] * 0.5;
-    xdot[2] = eMgoal[2][3] * 0.5;
+    xdot[0] = eMgoal[0][3] * 0.7;
+    xdot[1] = eMgoal[1][3] * 0.7;
+    xdot[2] = eMgoal[2][3] * 0.7;
     robot_->setCartesianVelocity(xdot);
     ros::spinOnce();
 
     robot_->getPosition(bMe);
     cMe = bMc.inverse() * bMe;
   }
+  if(robot_->getCurrent() >= (current+0.4)) ROS_ERROR_STREAM("OVERCURRENT: " << robot_->getCurrent());
 }
 
 int main(int argc, char **argv)
@@ -125,7 +126,7 @@ int main(int argc, char **argv)
     }
     vpHomogeneousMatrix cMgoal = VispUtils::vispHomogFromTfTransform(tf::Transform(transform2));
     //Mover a posición a través de movimiento lineal cartesiano.
-    reachPosition(cMgoal, bMc);
+    reachPosition(cMgoal, bMc, max_current);
     ROS_INFO("Starting position reached");
 
     if (pick)
@@ -138,16 +139,16 @@ int main(int argc, char **argv)
       //reachCloseposition... Currently there is any reachabillity check so the distance should be
       //near enough and the previous goal away from the workspace limits.
       int d;
-      nh.param("distance", d, 10);
+      nh.param("distance", d, 7);
       vpHomogeneousMatrix new_cMgoal = cMgoal * vpHomogeneousMatrix(0, 0, d/100.0, 0, 0, 0);
-      reachPosition(new_cMgoal, bMc);
+      reachPosition(new_cMgoal, bMc, max_current);
 
       ROS_INFO("Close position reached, Closing the gripper (until a current is sensed)");
       openGripper(velocity_closure, gripper_closed, max_current);
 
       ROS_INFO("Finished. Going home now...");
       //cMgoal = cMgoal * vpHomogeneousMatrix(0, 0, -0.4, 0, 0, 0);
-      reachPosition(cMgoal, bMc);
+      reachPosition(cMgoal, bMc, max_current);
 
       ROS_INFO("Grasp ended");
       pick=false;//This avoids dropping the amphora in real scenarios.One time only program.

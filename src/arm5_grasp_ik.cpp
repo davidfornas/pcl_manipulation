@@ -28,7 +28,7 @@ int main(int argc, char **argv)
   ARM5Arm robot(nh, "/uwsim/joint_state", "/uwsim/joint_state_command");
 
   broadcaster = new tf::TransformBroadcaster();
-  js_pub = nh.advertise<sensor_msgs::JointState>("/uwsim/joint_state_command", 1);
+  js_pub = nh.advertise<sensor_msgs::JointState>("/planner/joint_state_command", 1);
 
   ros::Rate rate(1);
   tf::TransformListener listener;
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
       final_joints2[1] = final_joints[1];
       final_joints2[2] = final_joints[2];
       final_joints2[3] = 1.57;
-      final_joints2[4] = 0;
+      final_joints2[4] = 0.5;/// @TODO from gripper aperture parameter
       bMg_fk = robot.directKinematics(final_joints2);
       //std::cout << "Reach to: " << bMg_fk << std::endl;
       //std::cout << "Desired: " << bMg << std::endl;
@@ -120,6 +120,7 @@ int main(int argc, char **argv)
     js.position.push_back(final_joints2[3]);
     js.name.push_back(std::string("JawOpening"));
     js.position.push_back(final_joints2[4]);
+    js_pub.publish(js);
 
     rate.sleep();
     ros::spinOnce();

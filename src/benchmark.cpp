@@ -19,16 +19,8 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "segmentation_benchmark");
   ros::NodeHandle nh;
 
-  //Variables de configuración: ángulo de agarre, distancias...
-  double angle, rad, along;
-  bool alignedGrasp;
-
   std::string input_basename("output");
   nh.getParam("input_basename", input_basename);
-  nh.param("alignedGrasp", alignedGrasp, false);
-  nh.getParam("angle", angle);
-  nh.getParam("rad", rad);
-  nh.getParam("along", along);
 
   //Point Cloud load
   std::string point_cloud_file(input_basename + std::string(".pcd"));
@@ -39,18 +31,17 @@ int main(int argc, char **argv)
 
 
   bool i = 0;
-  int iterations=500;
+  int iterations=1, inc=1;
 
-  while (ros::ok() && i<9)
+  while (ros::ok() && i<iterations)
   {
     //Init planner
-    ROS_ERROR_STREAM("Iterations: "<<iterations);
-    PCAutonomousGraspPlanning planner(angle, rad, along, alignedGrasp, cloud);
-    planner.setPlaneSegmentationParams(0.03, 100);
-    planner.setCylinderSegmentationParams(0.05, iterations, 0.1);
+    ROS_ERROR_STREAM("Iterations: " << iterations);
+    PCAutonomousGraspPlanning planner(0, 0, 0, false, cloud);
+    planner.setPlaneSegmentationParams(0.08, 200);
+    //planner.setCylinderSegmentationParams(0.02+0.01*i, 5000, 0.1);
     planner.perceive();
 
-    iterations-=70;
     i++;
   }
   return 0;

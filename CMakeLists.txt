@@ -69,6 +69,7 @@ add_executable(test_pcl src/test_pcl.cpp)
 
 #Manipulation specific programs
 add_executable(arm5e_pc_grasp_planning src/arm5e_pc_grasp_planning.cpp)
+add_executable(grasp_planning_with_arm src/grasp_planning_with_arm.cpp)
 add_executable(list_test src/list_test.cpp)
 add_executable(gt_grasp_exec src/gt_grasp_exec.cpp)
 add_executable(arm5_grasp_ik src/arm5_grasp_ik.cpp)
@@ -83,6 +84,7 @@ add_executable(forward_kinematics src/forward_kinematics.cpp)
 target_link_libraries (list_test ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OSGOCEAN_LIBRARIES} vtkHybrid vtkRendering) 
 
 target_link_libraries (arm5e_pc_grasp_planning ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OSGOCEAN_LIBRARIES} vtkHybrid vtkRendering) 
+target_link_libraries (grasp_planning_with_arm ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OSGOCEAN_LIBRARIES} vtkHybrid vtkRendering) 
 target_link_libraries (test_pcl ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OSGOCEAN_LIBRARIES} vtkHybrid vtkRendering) 
 target_link_libraries (save_cloud ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
 target_link_libraries (test_pcl ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
