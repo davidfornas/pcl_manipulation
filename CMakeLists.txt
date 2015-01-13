@@ -23,6 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
   mar_robot_arm5e
   uwsim
   robot_state_publisher
+  message_generation
 )
 
 find_package(uwsim REQUIRED)
@@ -35,7 +36,18 @@ find_package(VISP REQUIRED)
 find_package(PCL REQUIRED)
 find_package(orocos_kdl REQUIRED)
 
+## Generate services in the 'srv' folder
+ add_service_files(
+   FILES
+    DetectObject.srv
+)
+## Generate added messages and services with any dependencies listed here
+ generate_messages(
+#   DEPENDENCIES geometry_msgs
+ )
+
 catkin_package(
+  INCLUDE_DIRS include
   CATKIN_DEPENDS    
     roscpp
     sensor_msgs
@@ -47,6 +59,7 @@ catkin_package(
     mar_perception
     uwsim
     robot_state_publisher
+    message_runtime
   DEPENDS
     libxml++-2.6
     OpenSceneGraph
@@ -60,7 +73,7 @@ catkin_package(
 )
 
 add_definitions(${VISP_DEFINITIONS})
-INCLUDE_DIRECTORIES(${uwsim_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${OPENSCENEGRAPH_INCLUDE_DIRS} ${LIBXML++_INCLUDE_DIRS} ${VISP_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS} ${BULLET_INCLUDE_DIRS} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${OSGOCEAN_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(include ${uwsim_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${OPENSCENEGRAPH_INCLUDE_DIRS} ${LIBXML++_INCLUDE_DIRS} ${VISP_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS} ${BULLET_INCLUDE_DIRS} ${OSGWORKS_INCLUDE_DIR} ${OSGBULLET_INCLUDE_DIR} ${OSGOCEAN_INCLUDE_DIRS})
 LINK_DIRECTORIES(${LIBXML++_LIBRARY_DIRS} ${VISP_LIBRARY_DIRS})
 
 #PCL Test programs
@@ -69,6 +82,7 @@ add_executable(test_pcl src/test_pcl.cpp)
 
 #Manipulation specific programs
 add_executable(arm5e_pc_grasp_planning src/arm5e_pc_grasp_planning.cpp)
+add_executable(arm5e_pc_grasp_planning_server src/arm5e_pc_grasp_planning_server.cpp)
 add_executable(grasp_planning_with_arm src/grasp_planning_with_arm.cpp)
 add_executable(list_test src/list_test.cpp)
 add_executable(gt_grasp_exec src/gt_grasp_exec.cpp)
@@ -84,6 +98,7 @@ add_executable(forward_kinematics src/forward_kinematics.cpp)
 target_link_libraries (list_test ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OSGOCEAN_LIBRARIES} vtkHybrid vtkRendering) 
 
 target_link_libraries (arm5e_pc_grasp_planning ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OSGOCEAN_LIBRARIES} vtkHybrid vtkRendering) 
+target_link_libraries (arm5e_pc_grasp_planning_server ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OSGOCEAN_LIBRARIES} vtkHybrid vtkRendering) 
 target_link_libraries (grasp_planning_with_arm ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OSGOCEAN_LIBRARIES} vtkHybrid vtkRendering) 
 target_link_libraries (test_pcl ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} ${OSGWORKS_LIBRARIES} ${OSGBULLET_LIBRARIES} ${BULLET_LIBRARIES} ${OSGOCEAN_LIBRARIES} vtkHybrid vtkRendering) 
 target_link_libraries (save_cloud ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 

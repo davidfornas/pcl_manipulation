@@ -68,9 +68,13 @@ int main(int argc, char **argv)
   //Init planner
   PCAutonomousGraspPlanning planner(angle, rad, along, alignedGrasp, cloud);
 
+  planner.setPlaneSegmentationParams(0.09, 200);
   //Jar parameters
   //planner.setPlaneSegmentationParams(0.09, 200);
   //planner.setCylinderSegmentationParams(0.06, 10000, 0.1);
+  //Cylindric jar parameters 2, agresivelly removing floor
+  //planner.setPlaneSegmentationParams(0.1, 200);
+  //planner.setCylinderSegmentationParams(0.04, 20000, 0.1);
 
   planner.perceive();
 
@@ -133,6 +137,15 @@ int main(int argc, char **argv)
   //Hand frame wrt end-effector, allows for visual repositioning.
   vpHomogeneousMatrix eMh = mar_params::paramToVispHomogeneousMatrix(&nh, "eMh");
   vpHomogeneousMatrix cMe = planner.get_cMg(); //*eMh.inverse();
+
+  //Cylinder position
+  vpMatrix cMo = planner.get_cMg().transpose();
+  osg::Matrixd osg_cMo(cMg.data);
+  osg::MatrixTransform *osg_cMo2 = new osg::MatrixTransform(osg_cMo);
+  osg_cMo2->addChild(UWSimGeometry::createOSGCylinder(planner.radious, planner.height));
+  UWSimGeometry::applyStateSets(osg_cMo2);
+  builder.getScene()->localizedWorld->addChild(osg_cMo2);
+
 
   // Show muliple possibilities
   /// @todo 

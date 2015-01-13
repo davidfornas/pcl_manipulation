@@ -8,7 +8,7 @@
   
   <rosparam command="load" file="$(find pcl_manipulation)/launch/arm5e_pc_grasp_planning.yaml" />
   
-  <arg name="input_basename" default="picher" />
+  <arg name="input_basename" default="luz" />
   <arg name="rad" default="0.3" />
   <arg name="angle" default="1.57" /> 
   <arg name="along" default="0.0" /> 
