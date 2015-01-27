@@ -1,6 +1,7 @@
 #include "pcl_manipulation/arm5e_pc_grasp_planning_server.h"
 
 #include <mar_perception/PCAutonomousGraspPlanning.h>
+#include <unistd.h>
 
 pcl_manipulation::ObjectDetectionServer::ObjectDetectionServer(
   ros::NodeHandle& nh, ros::NodeHandle& nh_private) :
@@ -10,22 +11,34 @@ pcl_manipulation::ObjectDetectionServer::ObjectDetectionServer(
   service_server_ = nh_private_.advertiseService("detect_object",
       &ObjectDetectionServer::serviceCallback, this);
   ROS_INFO("Service \"detect_object\" advertised.");
+  cloud_found_=false;
 }
 
 bool pcl_manipulation::ObjectDetectionServer::serviceCallback(
     DetectObjectRequest& req,
     DetectObjectResponse& res)
 {
-  ROS_INFO("OD called. Starting detection");
+  ROS_INFO("Object detector called. Starting detection.");
   //subscribe to pointcloud...
-  sub_=nh_private_.subscribe("chatter", 1000, &ObjectDetectionServer::cloudCallback, this);
+  sub_=nh_private_.subscribe("/stereo_down/points2", 5, &ObjectDetectionServer::cloudCallback, this); //Parameterize topic name
   //wait for subscriber & cloud...
-  //pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
-  ROS_INFO("Start perception...");
+  while(!cloud_found_){ROS_INFO("*");ros::spinOnce();sleep(1);}
+  ROS_INFO("Cloud passed. Starting perception...");
   PCAutonomousGraspPlanning planner(0, 0, 0, true, cloud_);
   planner.perceive();
-  //cMg should be published in TF
-  //reachabillity and so on is done in client...
+  ROS_INFO("Perception finished.");
+  vpHomogeneousMatrix cMo = planner.get_cMg();
+  geometry_msgs::Pose p;
+  p.position.x=cMo[0][3];
+  p.position.y=cMo[1][3];
+  p.position.z=cMo[2][3];
+  vpQuaternionVector q; cMo.extract(q);
+  p.orientation.x=q.x();
+  p.orientation.y=q.y();
+  p.orientation.z=q.z();
+  p.orientation.w=q.w();
+  res.cMo=p;
+  res.success=true;
   return true;
 }
 
@@ -33,11 +46,17 @@ bool pcl_manipulation::ObjectDetectionServer::serviceCallback(
 void pcl_manipulation::ObjectDetectionServer::cloudCallback(const sensor_msgs::PointCloud2 input)
 {
   //ROS Points2 message to PCL.
+  ROS_INFO_STREAM("Acquiring cloud.");
   pcl::PCLPointCloud2 pcl_pc;
   pcl_conversions::toPCL(input, pcl_pc);
   //PCL Generic cloud to XYZRGB strong type.
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+  cloud_=cloud;
   pcl::fromPCLPointCloud2(pcl_pc, *cloud_);
-  ROS_INFO_STREAM("Acquiring cloud. Cloud size: " << cloud_->width * cloud_->height << "points.");
+  ROS_INFO_STREAM("Cloud size: " << cloud_->width * cloud_->height << "points.");
+  //ONLINE FILTERING from save_cloud.cpp
+
+  cloud_found_=true;
   sub_.shutdown();
 }
 

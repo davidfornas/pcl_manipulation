@@ -14,6 +14,7 @@ FIND_PACKAGE ( OpenSceneGraph COMPONENTS osgSim osgUtil osgDB osgFX osgGA osgTer
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
+  geometry_msgs
   nav_msgs
   tf
   tf_conversions
@@ -43,7 +44,7 @@ find_package(orocos_kdl REQUIRED)
 )
 ## Generate added messages and services with any dependencies listed here
  generate_messages(
-#   DEPENDENCIES geometry_msgs
+    DEPENDENCIES geometry_msgs
  )
 
 catkin_package(
@@ -51,6 +52,7 @@ catkin_package(
   CATKIN_DEPENDS    
     roscpp
     sensor_msgs
+    geometry_msgs
     nav_msgs
     tf
     tf_conversions

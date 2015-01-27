@@ -6,10 +6,8 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 
-//PCL Includes
 // PCL specific includes
 #include <pcl_conversions/pcl_conversions.h>
-
 #include <pcl/conversions.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
@@ -32,13 +30,10 @@ private:
   ros::ServiceServer service_server_;
 
   ros::Subscriber sub_;
-
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_;
-
+  bool cloud_found_;
 
 };
-
 } // end of namespace
-
 
 #endif

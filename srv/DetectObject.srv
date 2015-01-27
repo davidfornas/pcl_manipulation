@@ -1,3 +1,3 @@
 ---
 bool success
-#geometry_msgs/Pose cMo
+geometry_msgs/Pose cMo
