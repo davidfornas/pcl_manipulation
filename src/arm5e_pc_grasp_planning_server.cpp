@@ -24,7 +24,9 @@ bool pcl_manipulation::ObjectDetectionServer::serviceCallback(
   //wait for subscriber & cloud...
   while(!cloud_found_){ROS_INFO("*");ros::spinOnce();sleep(1);}
   ROS_INFO("Cloud passed. Starting perception...");
-  PCAutonomousGraspPlanning planner(0, 0, 0, true, cloud_);
+  PCAutonomousGraspPlanning planner(req.angle, req.rad, req.along, true, cloud_);
+  planner.setPlaneSegmentationParams(0.09, 200);
+  planner.setCylinderSegmentationParams(0.06, 10000, 0.1);
   planner.perceive();
   ROS_INFO("Perception finished.");
   vpHomogeneousMatrix cMo = planner.get_cMg();

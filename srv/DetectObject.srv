@@ -1,3 +1,6 @@
+float32 rad
+float32 angle
+float32 along
 ---
 bool success
 geometry_msgs/Pose cMo
