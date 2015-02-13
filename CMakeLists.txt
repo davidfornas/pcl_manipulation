@@ -89,6 +89,7 @@ add_executable(grasp_planning_with_arm src/grasp_planning_with_arm.cpp)
 add_executable(list_test src/list_test.cpp)
 add_executable(gt_grasp_exec src/gt_grasp_exec.cpp)
 add_executable(arm5_grasp_ik src/arm5_grasp_ik.cpp)
+add_executable(arm5_grasp_vehicle_ik src/arm5_grasp_vehicle_ik.cpp)
 add_executable(arm5_grasp_exec src/arm5_grasp_exec.cpp)
 add_executable(benchmark src/benchmark.cpp)
 
@@ -107,6 +108,7 @@ target_link_libraries (save_cloud ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES
 target_link_libraries (test_pcl ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
 target_link_libraries (gt_grasp_exec ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
 target_link_libraries (arm5_grasp_ik ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
+target_link_libraries (arm5_grasp_vehicle_ik ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
 target_link_libraries (arm5_grasp_exec ${catkin_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${LIBXML++_LIBRARIES} ${PCL_LIBRARIES} vtkHybrid vtkRendering) 
 
 target_link_libraries(VispToTFtest ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})

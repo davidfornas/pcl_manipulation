@@ -141,10 +141,12 @@ int main(int argc, char **argv)
   //Cylinder position
   vpMatrix cMo = planner.get_cMg().transpose();
   osg::Matrixd osg_cMo(cMg.data);
-  osg::MatrixTransform *osg_cMo2 = new osg::MatrixTransform(osg_cMo);
-  osg_cMo2->addChild(UWSimGeometry::createOSGCylinder(planner.radious, planner.height));
-  UWSimGeometry::applyStateSets(osg_cMo2);
-  builder.getScene()->localizedWorld->addChild(osg_cMo2);
+
+  //CYLINDER Test
+  //osg::MatrixTransform *osg_cMo2 = new osg::MatrixTransform(osg_cMo);
+  //osg_cMo2->addChild(UWSimGeometry::createOSGCylinder(planner.radious, planner.height));
+  //UWSimGeometry::applyStateSets(osg_cMo2);
+  //builder.getScene()->localizedWorld->addChild(osg_cMo2);
 
 
   // Show muliple possibilities

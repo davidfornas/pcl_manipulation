@@ -1,14 +1,20 @@
 <launch>
-  <!-- Should be calculate online with ARMarkers -->
-  <node pkg="tf" type="static_transform_publisher" name="stereo_to_kin" args="-0.2980558034 0.06071263135 0.2551243192 -0.1894883746 0.2325682007 -0.6640417613 0.684875702 kinematic_base stereo 100" />
-  <!-- node pkg="tf" type="static_transform_publisher" name="stereo_to_kin_sim" args="-0.500 0.060 -0.130 0.001 0.001 -0.707 0.707 kinematic_base stereo 100" /-->
+  <!-- Should be calculate online with ARMarkers, offline should take care of the PCD frame -->
+  <!--node pkg="tf" type="static_transform_publisher" name="stereo_to_kin" args="-0.2980558034 0.06071263135 0.2551243192 -0.1894883746 0.2325682007 -0.6640417613 0.684875702 kinematic_base stereo 100" /-->
+  <!--node pkg="tf" type="static_transform_publisher" name="stereo_to_kin_sim" args="-0.500 0.060 -0.130 0.001 0.001 -0.707 0.707 kinematic_base stereo 100" /-->
+  <!-- February 15: New camera relative position -->
+  <node pkg="tf" type="static_transform_publisher" name="stereo_to_kin_sim" args="-0.4 0.06 -0.03 -0.174  0.176 -0.685 0.685 kinematic_base stereo 100" />  
+  <node pkg="tf" type="static_transform_publisher" name="stereo_to_kin_sim2" args="-0.4 0.06 -0.03 -0.174  0.176 -0.685 0.685 kinematic_base2 stereo2 100" />
+ 
   <!--node pkg="tf" type="static_transform_publisher" name="stereo_to_kin_sim" args="-0.400 0.060 -0.030 -0.174 0.176 -0.685 0.685 kinematic_base stereo 100" /-->
   
-  
-  
+  <node pkg="tf" type="static_transform_publisher" name="vehicle_to_kin" args="0 0 1.08 3.14 0 0 vehicle kinematic_base 100" />
+  <node pkg="tf" type="static_transform_publisher" name="vehicle_to_kin2" args="0 0 1.08 3.14 0 0 vehicle2 kinematic_base2 100" />
+     
+  <!-- Currently unused, left as example -->
   <rosparam command="load" file="$(find pcl_manipulation)/launch/arm5e_pc_grasp_planning.yaml" />
   
-  <arg name="input_basename" default="luz" />
+  <arg name="input_basename" default="uwsimFeb15" />
   <arg name="rad" default="0.3" />
   <arg name="angle" default="1.57" /> 
   <arg name="along" default="0.0" /> 
@@ -21,9 +27,9 @@
   <param name="alignedGrasp" value="$(arg alignedGrasp)" />
   <param name="resources_data_path" value="$(find pcl_manipulation)/resources" />
   
-  <node name="arm5_grasp_ik" pkg="pcl_manipulation" type="arm5_grasp_ik" output="screen" respawn="false"/>
+  <node name="arm5_grasp_vehicle_ik" pkg="pcl_manipulation" type="arm5_grasp_vehicle_ik" output="screen" respawn="false"/>
+  <!--node name="arm5_grasp_ik" pkg="pcl_manipulation" type="arm5_grasp_ik" output="screen" respawn="false"/-->
   <node name="arm5e_pc_grasp_planning" pkg="pcl_manipulation" type="arm5e_pc_grasp_planning" output="screen" respawn="false"/>
-  
 </launch>
 
 
